@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "outDir": "dist",
+    "module": "esnext",
+    "strict": true,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationDir": "types",
+    "allowJs": false,
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "removeComments": true,
+    "types": [
+      "node",
+      "jest"
+    ],
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ]
+  },
+  "include": [
+    "src/**/*",
+    "types/vue-shims.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "demo"
+  ]
+}
