@@ -16,22 +16,22 @@
     ],
     "paths": {
       "@/*": [
-        "src/*"
+        "app/*"
       ],
       "assets/*": [
-        "src/assets/*"
+        "app/assets/*"
       ],
       "fonts/*": [
-        "src/fonts/*"
+        "app/fonts/*"
       ],
       "components/*": [
-        "src/components/*"
+        "app/components/*"
       ],
       "styles/*": [
-        "src/styles/*"
+        "app/styles/*"
       ],
-      "src/*": [
-        "src/*"
+      "app/*": [
+        "app/*"
       ]
     },
     "lib": [
@@ -43,9 +43,9 @@
     "noImplicitAny": false
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "app/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx",
     "types/**/*.d.ts"

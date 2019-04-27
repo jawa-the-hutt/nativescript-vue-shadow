@@ -6,4 +6,5 @@ declare class NSVueShadow {
 export declare namespace install {
     let installed: boolean;
 }
+export * from './common';
 export default NSVueShadow;

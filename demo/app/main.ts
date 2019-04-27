@@ -12,6 +12,10 @@ Vue.config.silent = false;
 // @ts-ignore
 Vue.config.debug = true;
 
+// setup NS-Vue Devtools for use
+import VueDevtools from 'nativescript-vue-devtools';
+Vue.use(VueDevtools, { host: '10.0.2.2' });
+
 new Vue({
   render: h => h('frame', [h(App)]),
 }).$start();

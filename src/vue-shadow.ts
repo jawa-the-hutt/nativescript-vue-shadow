@@ -35,12 +35,15 @@ export interface ShadowBindings extends VNodeDirective {
 	value?: ShadowValue;
 }
 
+let shadowDir!: NativeShadowDirective;
 
 export class NativeShadowDirective {
 
   private el: any;
   private shadow!: string | AndroidData | IOSData;
   private elevation?: number | string;
+
+// with this.elevation the following make up AndroidData object
   private pressedElevation?: number | string;
   private shape?: Shape;
   private bgcolor?: string;
@@ -48,14 +51,17 @@ export class NativeShadowDirective {
   private translationZ?: number | string;
   private pressedTranslationZ?: number | string;
   private forcePressAnimation?: boolean;
+
+  // with this.elevation the following make up IOSData object
   private maskToBounds?: boolean;
   private shadowColor?: string;
   private shadowOffset?: number | string;
   private shadowOpacity?: number | string;
   private shadowRadius?: number | string;
-  private useShadowPath?: boolean;
   private rasterize?: boolean;
+  private useShadowPath?: boolean;
 
+  // used to manage functions
   private loaded = false;
   private initialized = false;
   private originalNSFn: any;
@@ -108,6 +114,32 @@ export class NativeShadowDirective {
           this.loadFromIOSData(this.shadow as IOSData);
         }
       }
+
+      if (!this.shadow && this.elevation) {
+        if (isAndroid) {
+          this.loadFromAndroidData({
+            elevation: this.elevation,
+            pressedElevation: this.pressedElevation,
+            shape: this.shape,
+            bgcolor: this.bgcolor,
+            cornerRadius: this.cornerRadius,
+            translationZ: this.translationZ,
+            pressedTranslationZ: this.pressedTranslationZ,
+            forcePressAnimation: this.forcePressAnimation,
+          } as AndroidData);
+        } else if (isIOS) {
+          this.loadFromIOSData({
+            elevation: this.elevation,
+            maskToBounds: this.maskToBounds,
+            shadowColor: this.shadowColor,
+            shadowOffset: this.shadowOffset as number,
+            shadowOpacity: this.shadowOpacity as number,
+            shadowRadius: this.shadowRadius as number,
+            rasterize: this.rasterize,
+            useShadowPath: this.useShadowPath
+          } as IOSData);
+        }
+      }
       this.bindEvents();
     }
   }
@@ -157,22 +189,35 @@ export class NativeShadowDirective {
       this.init();
     }
     this.applyShadow();
-    if (isAndroid) {
-      this.previousNSFn = this.el._nativeView._redrawNativeBackground; // just to maintain compatibility with other patches
-      this.el._nativeView._redrawNativeBackground = this.monkeyPatch;
-    }
+    // if (isAndroid) {
+    //   this.previousNSFn = this.el._nativeView._redrawNativeBackground; // just to maintain compatibility with other patches
+    //   this.el._nativeView._redrawNativeBackground = this.monkeyPatch;
+    // }
   }
 
-  public addIosWrapper() {
+  public addIOSWrapper(): void {
     if (isIOS) {
-      const originalElement = this.el._nativeView as View;
+      const originalElement = this.el;
+      const parent = originalElement.parentNode;
+
+      const vm = new Vue({
+        template: '<StackLayout></StackLayout>',
+      }).$mount();
+
+      // @ts-ignore
+      const wrapper = vm.$el;
+
+      parent.insertBefore(wrapper, originalElement);
+      parent.removeChild(originalElement);
+      wrapper.appendChild(originalElement);      
+
+      // @ts-ignore
+      this.iosShadowWrapper = wrapper._nativeView as StackLayout;
 
       // this.iosShadowWrapper = this.render.createElement(
       //   'StackLayout'
       // ) as StackLayout;
 
-      // // wrappingElement.cssClasses = mainElement.cssClasses;
-      // const parent = originalElement.parentNode;
       // this.render.insertBefore(parent, this.iosShadowWrapper, originalElement);
       // this.render.removeChild(parent, originalElement);
       // this.render.appendChild(this.iosShadowWrapper, originalElement);
@@ -187,56 +232,56 @@ export class NativeShadowDirective {
     }
   }
 
-  public onChanges(changes: any) {
-    if (
-      this.loaded &&
-      !!changes &&
-      (changes.hasOwnProperty('shadow') ||
-        changes.hasOwnProperty('elevation') ||
-        changes.hasOwnProperty('pressedElevation') ||
-        changes.hasOwnProperty('shape') ||
-        changes.hasOwnProperty('bgcolor') ||
-        changes.hasOwnProperty('cornerRadius') ||
-        changes.hasOwnProperty('pressedTranslationZ') ||
-        changes.hasOwnProperty('forcePressAnimation') ||
-        changes.hasOwnProperty('translationZ') ||
-        changes.hasOwnProperty('maskToBounds') ||
-        changes.hasOwnProperty('shadowColor') ||
-        changes.hasOwnProperty('shadowOffset') ||
-        changes.hasOwnProperty('shadowOpacity') ||
-        changes.hasOwnProperty('shadowRadius') ||
-        changes.hasOwnProperty('rasterize') ||
-        changes.hasOwnProperty('useShadowMap'))
-    ) {
-      if (
-        changes.hasOwnProperty('shadow') &&
-        !changes.hasOwnProperty('elevation') &&
-        typeof changes.shadow === 'number'
-      ) {
-        this.elevation = changes.shadow;
+  public onUpdate(values: any) {
+    if (this.loaded && !!values && (
+      values.hasOwnProperty('shadow') ||
+      values.hasOwnProperty('elevation') ||
+      values.hasOwnProperty('pressedElevation') ||
+      values.hasOwnProperty('shape') ||
+      values.hasOwnProperty('bgcolor') ||
+      values.hasOwnProperty('cornerRadius') ||
+      values.hasOwnProperty('pressedTranslationZ') ||
+      values.hasOwnProperty('forcePressAnimation') ||
+      values.hasOwnProperty('translationZ') ||
+      values.hasOwnProperty('maskToBounds') ||
+      values.hasOwnProperty('shadowColor') ||
+      values.hasOwnProperty('shadowOffset') ||
+      values.hasOwnProperty('shadowOpacity') ||
+      values.hasOwnProperty('shadowRadius') ||
+      values.hasOwnProperty('rasterize') ||
+      values.hasOwnProperty('useShadowMap')
+    )) {
+      if (values.shadow && !values.shadow.elevation && typeof values.shadow === 'number') {
+        this.elevation = values.shadow;
       }
-      if (changes.shadow && changes.shadow.elevation) {
+
+      if ( values.shadow && values.shadow.elevation && !values.elevation) {
         if (isAndroid) {
-          this.loadFromAndroidData(this.shadow as AndroidData);
+          this.loadFromAndroidData(values.shadow as AndroidData);
         } else if (isIOS) {
-          this.loadFromIOSData(this.shadow as IOSData);
+          this.loadFromIOSData(values.shadow as IOSData);
         }
       }
+
+      if ( !values.shadow && values.elevation) {
+        if (isAndroid) {
+          this.loadFromAndroidData(values as AndroidData);
+        } else if (isIOS) {
+          this.loadFromIOSData(values as IOSData);
+        }
+      }
+
       this.applyShadow();
     }
   }
 
-  private monkeyPatch = (val) => {
-    this.previousNSFn.call(this.el._nativeView, val);
-    this.applyShadow();
-  };
+  // // private monkeyPatch = (val) => {
+  // //   this.previousNSFn.call(this.el._nativeView, val);
+  // //   this.applyShadow();
+  // // };
 
   private applyShadow() {
-    if (
-      this.shadow === null ||
-      this.shadow === undefined ||
-      (this.shadow === '' && !this.elevation)
-    ) {
+    if (this.shadow === null || this.shadow === undefined || (this.shadow === '' && !this.elevation)) {
       return;
     }
 
@@ -248,13 +293,13 @@ export class NativeShadowDirective {
       }
     }
 
-    const viewToApplyShadowTo = isIOS
-      ? this.iosShadowWrapper
-      : this.el._nativeView;
+    const viewToApplyShadowTo = isIOS ? this.iosShadowWrapper : this.el._nativeView;
 
     if (viewToApplyShadowTo) {
       Shadow.apply(viewToApplyShadowTo, {
         elevation: this.elevation as number,
+
+        // with this.elevation the following make up AndroidData object
         pressedElevation: this.pressedElevation as number,
         shape: this.shape,
         bgcolor: this.bgcolor,
@@ -262,6 +307,8 @@ export class NativeShadowDirective {
         translationZ: this.translationZ,
         pressedTranslationZ: this.pressedTranslationZ,
         forcePressAnimation: this.forcePressAnimation,
+
+        // with this.elevation the following make up Iosata object
         maskToBounds: this.maskToBounds,
         shadowColor: this.shadowColor,
         shadowOffset: this.shadowOffset as number,
@@ -280,9 +327,7 @@ export class NativeShadowDirective {
     }
     const tElevation = typeof this.elevation;
     if (tElevation === 'string' || tElevation === 'number') {
-      this.elevation = this.elevation
-        ? parseInt(this.elevation as string, 10)
-        : 2;
+      this.elevation = this.elevation ? parseInt(this.elevation as string, 10) : 2;
     }
   }
 
@@ -313,6 +358,8 @@ export class NativeShadowDirective {
     this.bgcolor = data.bgcolor || this.bgcolor;
     this.cornerRadius = data.cornerRadius || this.cornerRadius;
     this.translationZ = data.translationZ || this.translationZ;
+    this.pressedTranslationZ = data.pressedTranslationZ || this.pressedTranslationZ;
+    this.forcePressAnimation = data.forcePressAnimation || this.forcePressAnimation;
   }
 
   private loadFromIOSData(data: IOSData) {
@@ -332,7 +379,8 @@ export const ShadowDirective: DirectiveOptions = {
     console.log("v-shadow - bind")
     // console.log("v-shadow - bind - el - ", el);
     // console.log("v-shadow - bind - binding - ", binding);
-    const shadowDir: NativeShadowDirective = new NativeShadowDirective(el, binding);
+    // const shadowDir: NativeShadowDirective = new NativeShadowDirective(el, binding);
+    shadowDir = new NativeShadowDirective(el, binding);
     shadowDir.init();
 
 
@@ -341,28 +389,28 @@ export const ShadowDirective: DirectiveOptions = {
     console.log("v-shadow - inserted")
     // console.log("v-shadow - inserted - el - ", el);
     // console.log("v-shadow - inserted - binding - ", binding);
-    const shadowDir: NativeShadowDirective = new NativeShadowDirective(el, binding);
-    shadowDir.addIosWrapper();
+    shadowDir.addIOSWrapper();
   },
-  update(el, binding, vnode) {
+  update(el, { value, oldValue }, vnode) {
     console.log("v-shadow - update")
     // console.log("v-shadow - update - el - ", el);
-    // console.log("v-shadow - update - binding - ", binding);
-    const shadowDir: NativeShadowDirective = new NativeShadowDirective(el, binding);
-
+    console.log("v-shadow - update - oldValue - ", oldValue);
+    console.log("v-shadow - update - value - ", value);
+    // const shadowDir: NativeShadowDirective = new NativeShadowDirective(el, binding);
+    shadowDir.onUpdate(value);
   },
   componentUpdated(el, binding, vnode) {
     console.log("v-shadow - componentUpdated")
     // console.log("v-shadow - componentUpdated - el - ", el);
     // console.log("v-shadow - componentUpdated - binding - ", binding);
-    const shadowDir: NativeShadowDirective = new NativeShadowDirective(el, binding);
+    // const shadowDir: NativeShadowDirective = new NativeShadowDirective(el, binding);
 
   },
   unbind(el, binding, vnode) {
     console.log("v-shadow - unbind")
     // console.log("v-shadow - unbind - el - ", el);
     // console.log("v-shadow - unbind - binding - ", binding);
-    const shadowDir: NativeShadowDirective = new NativeShadowDirective(el, binding);
+    // const shadowDir: NativeShadowDirective = new NativeShadowDirective(el, binding);
     shadowDir.destroy();
 
   },

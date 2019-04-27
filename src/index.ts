@@ -3,13 +3,6 @@ import { VueConstructor, PluginFunction } from 'vue';
 // Import directive
 import { ShadowDirective } from './vue-shadow';
 
-
-// export default {
-//   install(Vue: VueConstructor): void {
-//     Vue.directive('shadow', ShadowDirective);
-//   },
-// };
-
 export function install(Vue: VueConstructor): void {
 
   if(install.installed) {
@@ -43,4 +36,5 @@ if (GlobalVue) {
   GlobalVue.use(NSVueShadow);
 }
 
+export * from './common';
 export default NSVueShadow;

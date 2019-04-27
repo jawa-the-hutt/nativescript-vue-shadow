@@ -39,17 +39,21 @@ const baseConfig = {
 const external = [
   // list external dependencies, exactly the way it is written in the import statement.
   // eg. 'jquery'
-  "vue",
+  "nativescript-vue",
   "tns-core-modules/color",
   "tns-core-modules/platform",
   "tns-core-modules/ui/page/page",
+  "tns-core-modules/ui/core/weak-event-listener",
+  "'tns-core-modules/ui/layouts/stack-layout"
 ];
 const globals = {
   // Provide global variable names to replace your external imports
   // eg. jquery: '$'
+  "nativescript-vue": 'vue',
   "tns-core-modules/color": 'color',
   "tns-core-modules/platform": 'platform',
   "tns-core-modules/ui/page/page": 'page',
+  "tns-core-modules/ui/core/weak-event-listener" : 'weakEventListener',
 };
 
 // Customize configs for individual targets

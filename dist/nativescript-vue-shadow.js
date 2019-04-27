@@ -1,10 +1,9 @@
-var NativescriptVueshadow=(function(exports,platform,color,page){'use strict';var ShapeEnum;
-(function (ShapeEnum) {
+var NativescriptVueshadow=(function(exports,Vue,platform,color,page,weakEventListener){'use strict';Vue=Vue&&Vue.hasOwnProperty('default')?Vue['default']:Vue;(function (ShapeEnum) {
     ShapeEnum["RECTANGLE"] = "RECTANGLE";
     ShapeEnum["OVAL"] = "OVAL";
     ShapeEnum["RING"] = "RING";
     ShapeEnum["LINE"] = "LINE";
-})(ShapeEnum || (ShapeEnum = {}));let LayeredShadow;
+})(exports.ShapeEnum || (exports.ShapeEnum = {}));let LayeredShadow;
 let PlainShadow;
 if (platform.isAndroid) {
     LayeredShadow = android.graphics.drawable.LayerDrawable.extend({});
@@ -83,7 +82,7 @@ class Shadow {
                     currentBg.getColor() : android.graphics.Color.parseColor(data.bgcolor || Shadow.DEFAULT_BGCOLOR)) :
                 android.graphics.Color.parseColor(data.bgcolor || Shadow.DEFAULT_BGCOLOR);
             let newBg;
-            if (data.shape !== ShapeEnum.RECTANGLE || data.bgcolor || !currentBg) {
+            if (data.shape !== exports.ShapeEnum.RECTANGLE || data.bgcolor || !currentBg) {
                 shape = new PlainShadow();
                 shape.setShape(android.graphics.drawable.GradientDrawable[data.shape]);
                 shape.setCornerRadii(outerRadii);
@@ -172,140 +171,12 @@ class Shadow {
         return android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_DIP, dip, metrics);
     }
 }
-Shadow.DEFAULT_SHAPE = ShapeEnum.RECTANGLE;
+Shadow.DEFAULT_SHAPE = exports.ShapeEnum.RECTANGLE;
 Shadow.DEFAULT_BGCOLOR = '#FFFFFF';
 Shadow.DEFAULT_SHADOW_COLOR = '#000000';
 Shadow.DEFAULT_PRESSED_ELEVATION = 2;
-Shadow.DEFAULT_PRESSED_Z = 4;function unwrapExports (x) {
-	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
-}
-
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
-}var weakEventListener = createCommonjsModule(function (module, exports) {
-Object.defineProperty(exports, "__esModule", { value: true });
-var handlersForEventName = new Map();
-var sourcesMap = new WeakMap();
-var TargetHandlerPair = (function () {
-    function TargetHandlerPair(target, handler) {
-        this.tagetRef = new WeakRef(target);
-        this.handler = handler;
-    }
-    return TargetHandlerPair;
-}());
-function getHandlerForEventName(eventName) {
-    var handler = handlersForEventName.get(eventName);
-    if (!handler) {
-        handler = function (eventData) {
-            var source = eventData.object;
-            var sourceEventMap = sourcesMap.get(source);
-            if (!sourceEventMap) {
-                source.removeEventListener(eventName, handlersForEventName.get(eventName));
-                return;
-            }
-            var targetHandlerPairList = sourceEventMap.get(eventName);
-            if (!targetHandlerPairList) {
-                return;
-            }
-            var deadPairsIndexes = [];
-            for (var i = 0; i < targetHandlerPairList.length; i++) {
-                var pair = targetHandlerPairList[i];
-                var target = pair.tagetRef.get();
-                if (target) {
-                    pair.handler.call(target, eventData);
-                }
-                else {
-                    deadPairsIndexes.push(i);
-                }
-            }
-            if (deadPairsIndexes.length === targetHandlerPairList.length) {
-                source.removeEventListener(eventName, handlersForEventName.get(eventName));
-                sourceEventMap.delete(eventName);
-            }
-            else {
-                for (var j = deadPairsIndexes.length - 1; j >= 0; j--) {
-                    targetHandlerPairList.splice(deadPairsIndexes[j], 1);
-                }
-            }
-        };
-        handlersForEventName.set(eventName, handler);
-    }
-    return handler;
-}
-function validateArgs(source, eventName, handler, target) {
-    if (!source) {
-        throw new Error("source is null or undefined");
-    }
-    if (!target) {
-        throw new Error("target is null or undefined");
-    }
-    if (typeof eventName !== "string") {
-        throw new Error("eventName is not a string");
-    }
-    if (typeof handler !== "function") {
-        throw new Error("handler is not a function");
-    }
-}
-function addWeakEventListener(source, eventName, handler, target) {
-    validateArgs(source, eventName, handler, target);
-    var shouldAttach = false;
-    var sourceEventMap = sourcesMap.get(source);
-    if (!sourceEventMap) {
-        sourceEventMap = new Map();
-        sourcesMap.set(source, sourceEventMap);
-        shouldAttach = true;
-    }
-    var pairList = sourceEventMap.get(eventName);
-    if (!pairList) {
-        pairList = new Array();
-        sourceEventMap.set(eventName, pairList);
-        shouldAttach = true;
-    }
-    pairList.push(new TargetHandlerPair(target, handler));
-    if (shouldAttach) {
-        source.addEventListener(eventName, getHandlerForEventName(eventName));
-    }
-}
-exports.addWeakEventListener = addWeakEventListener;
-function removeWeakEventListener(source, eventName, handler, target) {
-    validateArgs(source, eventName, handler, target);
-    var handlerForEventWithName = handlersForEventName.get(eventName);
-    if (!handlerForEventWithName) {
-        return;
-    }
-    var sourceEventMap = sourcesMap.get(source);
-    if (!sourceEventMap) {
-        return;
-    }
-    var targetHandlerPairList = sourceEventMap.get(eventName);
-    if (!targetHandlerPairList) {
-        return;
-    }
-    var targetHandlerPairsToRemove = [];
-    for (var i = 0; i < targetHandlerPairList.length; i++) {
-        var pair = targetHandlerPairList[i];
-        var registeredTarget = pair.tagetRef.get();
-        if (!registeredTarget || (registeredTarget === target && handler === pair.handler)) {
-            targetHandlerPairsToRemove.push(i);
-        }
-    }
-    if (targetHandlerPairsToRemove.length === targetHandlerPairList.length) {
-        source.removeEventListener(eventName, handlerForEventWithName);
-        sourceEventMap.delete(eventName);
-    }
-    else {
-        for (var j = targetHandlerPairsToRemove.length - 1; j >= 0; j--) {
-            targetHandlerPairList.splice(targetHandlerPairsToRemove[j], 1);
-        }
-    }
-}
-exports.removeWeakEventListener = removeWeakEventListener;
-
-});
-
-unwrapExports(weakEventListener);
-var weakEventListener_1 = weakEventListener.addWeakEventListener;
-var weakEventListener_2 = weakEventListener.removeWeakEventListener;class NativeShadowDirective {
+Shadow.DEFAULT_PRESSED_Z = 4;let shadowDir;
+class NativeShadowDirective {
     constructor(el, binding) {
         this.loaded = false;
         this.initialized = false;
@@ -357,6 +228,32 @@ var weakEventListener_2 = weakEventListener.removeWeakEventListener;class Native
                     this.loadFromIOSData(this.shadow);
                 }
             }
+            if (!this.shadow && this.elevation) {
+                if (platform.isAndroid) {
+                    this.loadFromAndroidData({
+                        elevation: this.elevation,
+                        pressedElevation: this.pressedElevation,
+                        shape: this.shape,
+                        bgcolor: this.bgcolor,
+                        cornerRadius: this.cornerRadius,
+                        translationZ: this.translationZ,
+                        pressedTranslationZ: this.pressedTranslationZ,
+                        forcePressAnimation: this.forcePressAnimation,
+                    });
+                }
+                else if (platform.isIOS) {
+                    this.loadFromIOSData({
+                        elevation: this.elevation,
+                        maskToBounds: this.maskToBounds,
+                        shadowColor: this.shadowColor,
+                        shadowOffset: this.shadowOffset,
+                        shadowOpacity: this.shadowOpacity,
+                        shadowRadius: this.shadowRadius,
+                        rasterize: this.rasterize,
+                        useShadowPath: this.useShadowPath
+                    });
+                }
+            }
             this.bindEvents();
         }
     }
@@ -369,8 +266,8 @@ var weakEventListener_2 = weakEventListener.removeWeakEventListener;class Native
     }
     bindEvents() {
         if (!this.eventsBound) {
-            weakEventListener_1(this.el._nativeView, page.View.loadedEvent, this.load, this);
-            weakEventListener_1(this.el._nativeView, page.View.unloadedEvent, this.unload, this);
+            weakEventListener.addWeakEventListener(this.el._nativeView, page.View.loadedEvent, this.load, this);
+            weakEventListener.addWeakEventListener(this.el._nativeView, page.View.unloadedEvent, this.unload, this);
             this.eventsBound = true;
             if (this.el._nativeView.isLoaded) {
                 this.load();
@@ -379,8 +276,8 @@ var weakEventListener_2 = weakEventListener.removeWeakEventListener;class Native
     }
     unbindEvents() {
         if (this.eventsBound) {
-            weakEventListener_2(this.el._nativeView, page.View.loadedEvent, this.load, this);
-            weakEventListener_2(this.el._nativeView, page.View.unloadedEvent, this.unload, this);
+            weakEventListener.removeWeakEventListener(this.el._nativeView, page.View.loadedEvent, this.load, this);
+            weakEventListener.removeWeakEventListener(this.el._nativeView, page.View.unloadedEvent, this.unload, this);
             this.eventsBound = false;
         }
     }
@@ -390,14 +287,19 @@ var weakEventListener_2 = weakEventListener.removeWeakEventListener;class Native
             this.init();
         }
         this.applyShadow();
-        if (platform.isAndroid) {
-            this.previousNSFn = this.el._nativeView._redrawNativeBackground;
-            this.el._nativeView._redrawNativeBackground = this.monkeyPatch;
-        }
     }
-    addIosWrapper() {
+    addIOSWrapper() {
         if (platform.isIOS) {
-            const originalElement = this.el._nativeView;
+            const originalElement = this.el;
+            const parent = originalElement.parentNode;
+            const vm = new Vue({
+                template: '<StackLayout></StackLayout>',
+            }).$mount();
+            const wrapper = vm.$el;
+            parent.insertBefore(wrapper, originalElement);
+            parent.removeChild(originalElement);
+            wrapper.appendChild(originalElement);
+            this.iosShadowWrapper = wrapper._nativeView;
         }
     }
     unload() {
@@ -406,45 +308,47 @@ var weakEventListener_2 = weakEventListener.removeWeakEventListener;class Native
             this.el._nativeView._redrawNativeBackground = this.originalNSFn;
         }
     }
-    onChanges(changes) {
-        if (this.loaded &&
-            !!changes &&
-            (changes.hasOwnProperty('shadow') ||
-                changes.hasOwnProperty('elevation') ||
-                changes.hasOwnProperty('pressedElevation') ||
-                changes.hasOwnProperty('shape') ||
-                changes.hasOwnProperty('bgcolor') ||
-                changes.hasOwnProperty('cornerRadius') ||
-                changes.hasOwnProperty('pressedTranslationZ') ||
-                changes.hasOwnProperty('forcePressAnimation') ||
-                changes.hasOwnProperty('translationZ') ||
-                changes.hasOwnProperty('maskToBounds') ||
-                changes.hasOwnProperty('shadowColor') ||
-                changes.hasOwnProperty('shadowOffset') ||
-                changes.hasOwnProperty('shadowOpacity') ||
-                changes.hasOwnProperty('shadowRadius') ||
-                changes.hasOwnProperty('rasterize') ||
-                changes.hasOwnProperty('useShadowMap'))) {
-            if (changes.hasOwnProperty('shadow') &&
-                !changes.hasOwnProperty('elevation') &&
-                typeof changes.shadow === 'number') {
-                this.elevation = changes.shadow;
+    onUpdate(values) {
+        if (this.loaded && !!values && (values.hasOwnProperty('shadow') ||
+            values.hasOwnProperty('elevation') ||
+            values.hasOwnProperty('pressedElevation') ||
+            values.hasOwnProperty('shape') ||
+            values.hasOwnProperty('bgcolor') ||
+            values.hasOwnProperty('cornerRadius') ||
+            values.hasOwnProperty('pressedTranslationZ') ||
+            values.hasOwnProperty('forcePressAnimation') ||
+            values.hasOwnProperty('translationZ') ||
+            values.hasOwnProperty('maskToBounds') ||
+            values.hasOwnProperty('shadowColor') ||
+            values.hasOwnProperty('shadowOffset') ||
+            values.hasOwnProperty('shadowOpacity') ||
+            values.hasOwnProperty('shadowRadius') ||
+            values.hasOwnProperty('rasterize') ||
+            values.hasOwnProperty('useShadowMap'))) {
+            if (values.shadow && !values.shadow.elevation && typeof values.shadow === 'number') {
+                this.elevation = values.shadow;
             }
-            if (changes.shadow && changes.shadow.elevation) {
+            if (values.shadow && values.shadow.elevation && !values.elevation) {
                 if (platform.isAndroid) {
-                    this.loadFromAndroidData(this.shadow);
+                    this.loadFromAndroidData(values.shadow);
                 }
                 else if (platform.isIOS) {
-                    this.loadFromIOSData(this.shadow);
+                    this.loadFromIOSData(values.shadow);
+                }
+            }
+            if (!values.shadow && values.elevation) {
+                if (platform.isAndroid) {
+                    this.loadFromAndroidData(values);
+                }
+                else if (platform.isIOS) {
+                    this.loadFromIOSData(values);
                 }
             }
             this.applyShadow();
         }
     }
     applyShadow() {
-        if (this.shadow === null ||
-            this.shadow === undefined ||
-            (this.shadow === '' && !this.elevation)) {
+        if (this.shadow === null || this.shadow === undefined || (this.shadow === '' && !this.elevation)) {
             return;
         }
         if (platform.isAndroid) {
@@ -452,9 +356,7 @@ var weakEventListener_2 = weakEventListener.removeWeakEventListener;class Native
                 return;
             }
         }
-        const viewToApplyShadowTo = platform.isIOS
-            ? this.iosShadowWrapper
-            : this.el._nativeView;
+        const viewToApplyShadowTo = platform.isIOS ? this.iosShadowWrapper : this.el._nativeView;
         if (viewToApplyShadowTo) {
             Shadow.apply(viewToApplyShadowTo, {
                 elevation: this.elevation,
@@ -482,9 +384,7 @@ var weakEventListener_2 = weakEventListener.removeWeakEventListener;class Native
         }
         const tElevation = typeof this.elevation;
         if (tElevation === 'string' || tElevation === 'number') {
-            this.elevation = this.elevation
-                ? parseInt(this.elevation, 10)
-                : 2;
+            this.elevation = this.elevation ? parseInt(this.elevation, 10) : 2;
         }
     }
     initializeAndroidData() {
@@ -512,6 +412,8 @@ var weakEventListener_2 = weakEventListener.removeWeakEventListener;class Native
         this.bgcolor = data.bgcolor || this.bgcolor;
         this.cornerRadius = data.cornerRadius || this.cornerRadius;
         this.translationZ = data.translationZ || this.translationZ;
+        this.pressedTranslationZ = data.pressedTranslationZ || this.pressedTranslationZ;
+        this.forcePressAnimation = data.forcePressAnimation || this.forcePressAnimation;
     }
     loadFromIOSData(data) {
         this.maskToBounds = data.maskToBounds || this.maskToBounds;
@@ -526,28 +428,52 @@ var weakEventListener_2 = weakEventListener.removeWeakEventListener;class Native
 const ShadowDirective = {
     bind(el, binding, vnode) {
         console.log("v-shadow - bind");
-        const shadowDir = new NativeShadowDirective(el, binding);
+        shadowDir = new NativeShadowDirective(el, binding);
         shadowDir.init();
     },
     inserted(el, binding, vnode) {
         console.log("v-shadow - inserted");
-        const shadowDir = new NativeShadowDirective(el, binding);
-        shadowDir.addIosWrapper();
+        shadowDir.addIOSWrapper();
     },
-    update(el, binding, vnode) {
+    update(el, { value, oldValue }, vnode) {
         console.log("v-shadow - update");
-        const shadowDir = new NativeShadowDirective(el, binding);
+        console.log("v-shadow - update - oldValue - ", oldValue);
+        console.log("v-shadow - update - value - ", value);
+        shadowDir.onUpdate(value);
     },
     componentUpdated(el, binding, vnode) {
         console.log("v-shadow - componentUpdated");
-        const shadowDir = new NativeShadowDirective(el, binding);
     },
     unbind(el, binding, vnode) {
         console.log("v-shadow - unbind");
-        const shadowDir = new NativeShadowDirective(el, binding);
         shadowDir.destroy();
     },
-};function install(Vue) {
+};(function (Elevation) {
+    Elevation[Elevation["SWITCH"] = 1] = "SWITCH";
+    Elevation[Elevation["CARD_RESTING"] = 2] = "CARD_RESTING";
+    Elevation[Elevation["RAISED_BUTTON_RESTING"] = 2] = "RAISED_BUTTON_RESTING";
+    Elevation[Elevation["SEARCH_BAR_RESTING"] = 2] = "SEARCH_BAR_RESTING";
+    Elevation[Elevation["REFRESH_INDICADOR"] = 3] = "REFRESH_INDICADOR";
+    Elevation[Elevation["SEARCH_BAR_SCROLLED"] = 3] = "SEARCH_BAR_SCROLLED";
+    Elevation[Elevation["APPBAR"] = 4] = "APPBAR";
+    Elevation[Elevation["FAB_RESTING"] = 6] = "FAB_RESTING";
+    Elevation[Elevation["SNACKBAR"] = 6] = "SNACKBAR";
+    Elevation[Elevation["BOTTOM_NAVIGATION_BAR"] = 8] = "BOTTOM_NAVIGATION_BAR";
+    Elevation[Elevation["MENU"] = 8] = "MENU";
+    Elevation[Elevation["CARD_PICKED_UP"] = 8] = "CARD_PICKED_UP";
+    Elevation[Elevation["RAISED_BUTTON_PRESSED"] = 8] = "RAISED_BUTTON_PRESSED";
+    Elevation[Elevation["SUBMENU_LEVEL1"] = 9] = "SUBMENU_LEVEL1";
+    Elevation[Elevation["SUBMENU_LEVEL2"] = 10] = "SUBMENU_LEVEL2";
+    Elevation[Elevation["SUBMENU_LEVEL3"] = 11] = "SUBMENU_LEVEL3";
+    Elevation[Elevation["SUBMENU_LEVEL4"] = 12] = "SUBMENU_LEVEL4";
+    Elevation[Elevation["SUBMENU_LEVEL5"] = 13] = "SUBMENU_LEVEL5";
+    Elevation[Elevation["FAB_PRESSED"] = 12] = "FAB_PRESSED";
+    Elevation[Elevation["NAV_DRAWER"] = 16] = "NAV_DRAWER";
+    Elevation[Elevation["RIGHT_DRAWER"] = 16] = "RIGHT_DRAWER";
+    Elevation[Elevation["MODAL_BOTTOM_SHEET"] = 16] = "MODAL_BOTTOM_SHEET";
+    Elevation[Elevation["DIALOG"] = 24] = "DIALOG";
+    Elevation[Elevation["PICKER"] = 24] = "PICKER";
+})(exports.Elevation || (exports.Elevation = {}));function install(Vue) {
     if (install.installed) {
         console.log('not installed');
         return;
@@ -571,4 +497,4 @@ else if (typeof global !== "undefined" && typeof global['Vue'] !== 'undefined') 
 }
 if (GlobalVue) {
     GlobalVue.use(NSVueShadow);
-}exports.default=NSVueShadow;exports.install=install;return exports;}({},platform,color,page));
+}exports.Shadow=Shadow;exports.default=NSVueShadow;exports.install=install;return exports;}({},vue,platform,color,page,weakEventListener));

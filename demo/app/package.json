@@ -3,7 +3,7 @@
     "v8Flags": "--expose_gc",
     "markingMode": "none"
   },
-  "main": "main.native",
+  "main": "main",
   "name": "demo",
   "version": "0.1.0"
 }

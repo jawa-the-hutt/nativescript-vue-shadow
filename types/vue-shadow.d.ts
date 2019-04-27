@@ -39,8 +39,8 @@ export declare class NativeShadowDirective {
     private shadowOffset?;
     private shadowOpacity?;
     private shadowRadius?;
-    private useShadowPath?;
     private rasterize?;
+    private useShadowPath?;
     private loaded;
     private initialized;
     private originalNSFn;
@@ -53,9 +53,9 @@ export declare class NativeShadowDirective {
     bindEvents(): void;
     unbindEvents(): void;
     load(): void;
-    addIosWrapper(): void;
+    addIOSWrapper(): void;
     unload(): void;
-    onChanges(changes: any): void;
+    onUpdate(values: any): void;
     private monkeyPatch;
     private applyShadow;
     private initializeCommonData;
