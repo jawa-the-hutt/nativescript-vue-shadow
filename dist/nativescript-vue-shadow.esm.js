@@ -186,7 +186,6 @@ Shadow.DEFAULT_SHADOW_COLOR = '#000000';
 Shadow.DEFAULT_PRESSED_ELEVATION = 2;
 Shadow.DEFAULT_PRESSED_Z = 4;
 
-let shadowDir;
 class NativeShadowDirective {
     constructor(el, binding) {
         this.loaded = false;
@@ -199,21 +198,63 @@ class NativeShadowDirective {
         this.el = el;
         if (binding.value) {
             this.shadow = binding.value.shadow;
-            this.elevation = binding.value.elevation;
-            this.pressedElevation = binding.value.pressedElevation;
-            this.shape = binding.value.shape;
-            this.bgcolor = binding.value.bgcolor;
-            this.cornerRadius = binding.value.cornerRadius;
-            this.translationZ = binding.value.translationZ;
-            this.pressedTranslationZ = binding.value.pressedTranslationZ;
-            this.forcePressAnimation = binding.value.forcePressAnimation;
-            this.maskToBounds = binding.value.maskToBounds;
-            this.shadowColor = binding.value.shadowColor;
-            this.shadowOffset = binding.value.shadowOffset;
-            this.shadowOpacity = binding.value.shadowOpacity;
-            this.shadowRadius = binding.value.shadowRadius;
-            this.useShadowPath = binding.value.useShadowPath;
-            this.rasterize = binding.value.rasterize;
+            if (this.shadow && (typeof this.shadow !== 'string' && !this.shadow.elevation) && typeof this.shadow === 'number') {
+                this.elevation = this.shadow;
+            }
+            if (this.shadow && (typeof this.shadow !== 'string' && this.shadow.elevation) && !this.elevation) {
+                this.elevation = this.shadow.elevation;
+                if (isAndroid && (('pressedElevation' in this.shadow) ||
+                    ('shape' in this.shadow) ||
+                    ('bgcolor' in this.shadow) ||
+                    ('cornerRadius' in this.shadow) ||
+                    ('translationZ' in this.shadow) ||
+                    ('pressedTranslationZ' in this.shadow) ||
+                    ('forcePressAnimation' in this.shadow))) {
+                    this.pressedElevation = this.shadow.pressedElevation;
+                    this.shape = this.shadow.shape;
+                    this.bgcolor = this.shadow.bgcolor;
+                    this.cornerRadius = this.shadow.cornerRadius;
+                    this.translationZ = this.shadow.translationZ;
+                    this.pressedTranslationZ = this.shadow.pressedTranslationZ;
+                    this.forcePressAnimation = this.shadow.forcePressAnimation;
+                }
+                else if (isIOS && (('maskToBounds' in this.shadow) ||
+                    ('shadowColor' in this.shadow) ||
+                    ('shadowOffset' in this.shadow) ||
+                    ('shadowOpacity' in this.shadow) ||
+                    ('shadowRadius' in this.shadow) ||
+                    ('useShadowPath' in this.shadow) ||
+                    ('rasterize' in this.shadow))) {
+                    this.maskToBounds = this.shadow.maskToBounds;
+                    this.shadowColor = this.shadow.shadowColor;
+                    this.shadowOffset = this.shadow.shadowOffset;
+                    this.shadowOpacity = this.shadow.shadowOpacity;
+                    this.shadowRadius = this.shadow.shadowRadius;
+                    this.useShadowPath = this.shadow.useShadowPath;
+                    this.rasterize = this.shadow.rasterize;
+                }
+            }
+            if (!binding.value.shadow && binding.value.elevation) {
+                this.elevation = binding.value.elevation;
+                if (isAndroid) {
+                    this.pressedElevation = binding.value.pressedElevation;
+                    this.shape = binding.value.shape;
+                    this.bgcolor = binding.value.bgcolor;
+                    this.cornerRadius = binding.value.cornerRadius;
+                    this.translationZ = binding.value.translationZ;
+                    this.pressedTranslationZ = binding.value.pressedTranslationZ;
+                    this.forcePressAnimation = binding.value.forcePressAnimation;
+                }
+                else if (isIOS) {
+                    this.maskToBounds = binding.value.maskToBounds;
+                    this.shadowColor = binding.value.shadowColor;
+                    this.shadowOffset = binding.value.shadowOffset;
+                    this.shadowOpacity = binding.value.shadowOpacity;
+                    this.shadowRadius = binding.value.shadowRadius;
+                    this.useShadowPath = binding.value.useShadowPath;
+                    this.rasterize = binding.value.rasterize;
+                }
+            }
         }
         if (isAndroid) {
             if (this.el._nativeView._redrawNativeBackground) {
@@ -294,10 +335,11 @@ class NativeShadowDirective {
     }
     load() {
         this.loaded = true;
-        if (!this.initialized) {
-            this.init();
-        }
         this.applyShadow();
+        if (isAndroid) {
+            this.previousNSFn = this.el._nativeView._redrawNativeBackground;
+            this.el._nativeView._redrawNativeBackground = this.monkeyPatch;
+        }
     }
     addIOSWrapper() {
         if (isIOS) {
@@ -320,26 +362,27 @@ class NativeShadowDirective {
         }
     }
     onUpdate(values) {
-        if (this.loaded && !!values && (values.hasOwnProperty('shadow') ||
-            values.hasOwnProperty('elevation') ||
-            values.hasOwnProperty('pressedElevation') ||
-            values.hasOwnProperty('shape') ||
-            values.hasOwnProperty('bgcolor') ||
-            values.hasOwnProperty('cornerRadius') ||
-            values.hasOwnProperty('pressedTranslationZ') ||
-            values.hasOwnProperty('forcePressAnimation') ||
-            values.hasOwnProperty('translationZ') ||
-            values.hasOwnProperty('maskToBounds') ||
-            values.hasOwnProperty('shadowColor') ||
-            values.hasOwnProperty('shadowOffset') ||
-            values.hasOwnProperty('shadowOpacity') ||
-            values.hasOwnProperty('shadowRadius') ||
-            values.hasOwnProperty('rasterize') ||
-            values.hasOwnProperty('useShadowMap'))) {
+        if (this.loaded && !!values && (values.shadow ||
+            values.elevation ||
+            values.pressedElevation ||
+            values.shape ||
+            values.bgcolor ||
+            values.cornerRadius ||
+            values.pressedTranslationZ ||
+            values.forcePressAnimation ||
+            values.translationZ ||
+            values.maskToBounds ||
+            values.shadowColor ||
+            values.shadowOffset ||
+            values.shadowOpacity ||
+            values.shadowRadius ||
+            values.rasterize ||
+            values.useShadowMap)) {
             if (values.shadow && !values.shadow.elevation && typeof values.shadow === 'number') {
                 this.elevation = values.shadow;
             }
             if (values.shadow && values.shadow.elevation && !values.elevation) {
+                this.elevation = values.shadow.elevation;
                 if (isAndroid) {
                     this.loadFromAndroidData(values.shadow);
                 }
@@ -348,6 +391,7 @@ class NativeShadowDirective {
                 }
             }
             if (!values.shadow && values.elevation) {
+                this.elevation = values.elevation;
                 if (isAndroid) {
                     this.loadFromAndroidData(values);
                 }
@@ -359,7 +403,7 @@ class NativeShadowDirective {
         }
     }
     applyShadow() {
-        if (this.shadow === null || this.shadow === undefined || (this.shadow === '' && !this.elevation)) {
+        if (!this.shadow && !this.elevation) {
             return;
         }
         if (isAndroid) {
@@ -438,26 +482,24 @@ class NativeShadowDirective {
 }
 const ShadowDirective = {
     bind(el, binding, vnode) {
-        console.log("v-shadow - bind");
-        shadowDir = new NativeShadowDirective(el, binding);
+        const shadowDir = new NativeShadowDirective(el, binding);
         shadowDir.init();
+        el.__vShadow = shadowDir;
     },
     inserted(el, binding, vnode) {
-        console.log("v-shadow - inserted");
+        const shadowDir = el.__vShadow;
         shadowDir.addIOSWrapper();
     },
     update(el, { value, oldValue }, vnode) {
-        console.log("v-shadow - update");
-        console.log("v-shadow - update - oldValue - ", oldValue);
-        console.log("v-shadow - update - value - ", value);
+        const shadowDir = el.__vShadow;
         shadowDir.onUpdate(value);
     },
-    componentUpdated(el, binding, vnode) {
-        console.log("v-shadow - componentUpdated");
+    componentUpdated(el, { value, oldValue }, vnode) {
     },
     unbind(el, binding, vnode) {
-        console.log("v-shadow - unbind");
+        const shadowDir = el.__vShadow;
         shadowDir.destroy();
+        el.__vShadow = null;
     },
 };
 

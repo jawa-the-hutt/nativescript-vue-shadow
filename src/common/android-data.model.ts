@@ -1,6 +1,6 @@
 import { Shape } from './shape.enum';
 
-export interface AndroidData {
+export type AndroidData = {
   elevation: number;
   pressedElevation?: number;
   shape?: Shape;

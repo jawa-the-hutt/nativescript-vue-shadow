@@ -3,29 +3,29 @@ import { AndroidData } from './common/android-data.model';
 import { IOSData } from './common/ios-data.model';
 import { Shape } from './common/shape.enum';
 export interface ShadowValue {
-    shadow: string | AndroidData | IOSData;
-    elevation: number | string;
-    pressedElevation: number | string;
-    shape: Shape;
-    bgcolor: string;
-    cornerRadius: number | string;
-    translationZ: number | string;
-    pressedTranslationZ: number | string;
-    forcePressAnimation: boolean;
-    maskToBounds: boolean;
-    shadowColor: string;
-    shadowOffset: number | string;
-    shadowOpacity: number | string;
-    shadowRadius: number | string;
-    useShadowPath: boolean;
-    rasterize: boolean;
+    shadow?: string | AndroidData | IOSData;
+    elevation?: number | string;
+    pressedElevation?: number | string;
+    shape?: Shape;
+    bgcolor?: string;
+    cornerRadius?: number | string;
+    translationZ?: number | string;
+    pressedTranslationZ?: number | string;
+    forcePressAnimation?: boolean;
+    maskToBounds?: boolean;
+    shadowColor?: string;
+    shadowOffset?: number | string;
+    shadowOpacity?: number | string;
+    shadowRadius?: number | string;
+    useShadowPath?: boolean;
+    rasterize?: boolean;
 }
 export interface ShadowBindings extends VNodeDirective {
     value?: ShadowValue;
 }
 export declare class NativeShadowDirective {
     private el;
-    private shadow;
+    private shadow?;
     private elevation?;
     private pressedElevation?;
     private shape?;
