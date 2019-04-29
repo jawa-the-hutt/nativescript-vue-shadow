@@ -37,10 +37,7 @@
     "typescript",
     "web",
     "code share",
-    "dynamic component",
-    "router",
-    "navigation",
-    "vuex"
+    "shadow"
   ],
   "author": "Gary Gambill",
   "license": "MIT",
