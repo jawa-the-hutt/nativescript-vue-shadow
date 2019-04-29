@@ -1,5 +1,5 @@
 import { Shape } from './shape.enum';
-export interface AndroidData {
+export declare type AndroidData = {
     elevation: number;
     pressedElevation?: number;
     shape?: Shape;
@@ -8,4 +8,4 @@ export interface AndroidData {
     translationZ?: number;
     pressedTranslationZ?: number;
     forcePressAnimation?: boolean;
-}
+};

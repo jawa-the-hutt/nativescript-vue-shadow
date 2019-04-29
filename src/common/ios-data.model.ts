@@ -1,4 +1,4 @@
-export interface IOSData {
+export type IOSData = {
   elevation: number;
   maskToBounds?: boolean;
   shadowColor?: string;

@@ -1,4 +1,4 @@
-export interface IOSData {
+export declare type IOSData = {
     elevation: number;
     maskToBounds?: boolean;
     shadowColor?: string;
@@ -7,4 +7,4 @@ export interface IOSData {
     shadowRadius?: number;
     rasterize?: boolean;
     useShadowPath?: boolean;
-}
+};
