@@ -185,64 +185,42 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
             this.applyShadow();
         };
         this.el = el;
-        if (binding.value) {
-            this.shadow = binding.value.shadow;
-            if (this.shadow && (typeof this.shadow !== 'string' && !this.shadow.elevation) && typeof this.shadow === 'number') {
-                this.elevation = this.shadow;
+        if (binding.value && typeof binding.value !== 'object' && (typeof binding.value === 'string' || typeof binding.value === 'number')) {
+            this.shadow = binding.value;
+            this.elevation = binding.value;
+        }
+        if (binding.value && typeof binding.value === 'object' && binding.value.elevation) {
+            this.shadow = binding.value;
+            this.elevation = this.shadow.elevation;
+            if (platform.isAndroid && (('pressedElevation' in this.shadow) ||
+                ('shape' in this.shadow) ||
+                ('bgcolor' in this.shadow) ||
+                ('cornerRadius' in this.shadow) ||
+                ('translationZ' in this.shadow) ||
+                ('pressedTranslationZ' in this.shadow) ||
+                ('forcePressAnimation' in this.shadow))) {
+                this.pressedElevation = this.shadow.pressedElevation;
+                this.shape = this.shadow.shape;
+                this.bgcolor = this.shadow.bgcolor;
+                this.cornerRadius = this.shadow.cornerRadius;
+                this.translationZ = this.shadow.translationZ;
+                this.pressedTranslationZ = this.shadow.pressedTranslationZ;
+                this.forcePressAnimation = this.shadow.forcePressAnimation;
             }
-            if (this.shadow && (typeof this.shadow !== 'string' && this.shadow.elevation) && !this.elevation) {
-                this.elevation = this.shadow.elevation;
-                if (platform.isAndroid && (('pressedElevation' in this.shadow) ||
-                    ('shape' in this.shadow) ||
-                    ('bgcolor' in this.shadow) ||
-                    ('cornerRadius' in this.shadow) ||
-                    ('translationZ' in this.shadow) ||
-                    ('pressedTranslationZ' in this.shadow) ||
-                    ('forcePressAnimation' in this.shadow))) {
-                    this.pressedElevation = this.shadow.pressedElevation;
-                    this.shape = this.shadow.shape;
-                    this.bgcolor = this.shadow.bgcolor;
-                    this.cornerRadius = this.shadow.cornerRadius;
-                    this.translationZ = this.shadow.translationZ;
-                    this.pressedTranslationZ = this.shadow.pressedTranslationZ;
-                    this.forcePressAnimation = this.shadow.forcePressAnimation;
-                }
-                else if (platform.isIOS && (('maskToBounds' in this.shadow) ||
-                    ('shadowColor' in this.shadow) ||
-                    ('shadowOffset' in this.shadow) ||
-                    ('shadowOpacity' in this.shadow) ||
-                    ('shadowRadius' in this.shadow) ||
-                    ('useShadowPath' in this.shadow) ||
-                    ('rasterize' in this.shadow))) {
-                    this.maskToBounds = this.shadow.maskToBounds;
-                    this.shadowColor = this.shadow.shadowColor;
-                    this.shadowOffset = this.shadow.shadowOffset;
-                    this.shadowOpacity = this.shadow.shadowOpacity;
-                    this.shadowRadius = this.shadow.shadowRadius;
-                    this.useShadowPath = this.shadow.useShadowPath;
-                    this.rasterize = this.shadow.rasterize;
-                }
-            }
-            if (!binding.value.shadow && binding.value.elevation) {
-                this.elevation = binding.value.elevation;
-                if (platform.isAndroid) {
-                    this.pressedElevation = binding.value.pressedElevation;
-                    this.shape = binding.value.shape;
-                    this.bgcolor = binding.value.bgcolor;
-                    this.cornerRadius = binding.value.cornerRadius;
-                    this.translationZ = binding.value.translationZ;
-                    this.pressedTranslationZ = binding.value.pressedTranslationZ;
-                    this.forcePressAnimation = binding.value.forcePressAnimation;
-                }
-                else if (platform.isIOS) {
-                    this.maskToBounds = binding.value.maskToBounds;
-                    this.shadowColor = binding.value.shadowColor;
-                    this.shadowOffset = binding.value.shadowOffset;
-                    this.shadowOpacity = binding.value.shadowOpacity;
-                    this.shadowRadius = binding.value.shadowRadius;
-                    this.useShadowPath = binding.value.useShadowPath;
-                    this.rasterize = binding.value.rasterize;
-                }
+            else if (platform.isIOS && (('maskToBounds' in this.shadow) ||
+                ('shadowColor' in this.shadow) ||
+                ('shadowOffset' in this.shadow) ||
+                ('shadowOpacity' in this.shadow) ||
+                ('shadowRadius' in this.shadow) ||
+                ('useShadowPath' in this.shadow) ||
+                ('rasterize' in this.shadow))) {
+                this.maskToBounds = this.shadow.maskToBounds;
+                this.shadowColor = this.shadow.shadowColor;
+                this.shadowOffset = this.shadow.shadowOffset;
+                this.shadowOpacity = this.shadow.shadowOpacity;
+                this.shadowRadius = this.shadow.shadowRadius;
+                this.useShadowPath = this.shadow.useShadowPath;
+                this.rasterize = this.shadow.rasterize;
             }
         }
         if (platform.isAndroid) {
@@ -421,41 +399,19 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
         }
     }
     onUpdate(values) {
-        if (this.loaded && !!values && (values.shadow ||
-            values.elevation ||
-            values.pressedElevation ||
-            values.shape ||
-            values.bgcolor ||
-            values.cornerRadius ||
-            values.pressedTranslationZ ||
-            values.forcePressAnimation ||
-            values.translationZ ||
-            values.maskToBounds ||
-            values.shadowColor ||
-            values.shadowOffset ||
-            values.shadowOpacity ||
-            values.shadowRadius ||
-            values.rasterize ||
-            values.useShadowPath)) {
-            if (values.shadow && (typeof values.shadow !== 'string' && !values.shadow.elevation) && typeof values.shadow === 'number') {
-                this.elevation = values.shadow;
+        if (this.loaded && !!values) {
+            if (typeof values !== 'object' && (typeof values === 'string' || typeof values === 'number')) {
+                this.shadow = values;
+                this.elevation = values;
             }
-            if (values.shadow && (typeof values.shadow !== 'string' && values.shadow.elevation) && !values.elevation) {
-                this.elevation = values.shadow.elevation;
+            if (typeof values === 'object' && values.elevation) {
+                this.shadow = values;
+                this.elevation = this.shadow.elevation;
                 if (platform.isAndroid) {
-                    this.loadFromAndroidData(values.shadow);
+                    this.loadFromAndroidData(this.shadow);
                 }
                 else if (platform.isIOS) {
-                    this.loadFromIOSData(values.shadow);
-                }
-            }
-            if (!values.shadow && values.elevation) {
-                this.elevation = values.elevation;
-                if (platform.isAndroid) {
-                    this.loadFromAndroidData(values);
-                }
-                else if (platform.isIOS) {
-                    this.loadFromIOSData(values);
+                    this.loadFromIOSData(this.shadow);
                 }
             }
             this.applyShadow();

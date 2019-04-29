@@ -2,7 +2,6 @@ import Vue from 'nativescript-vue';
 import App from './App.vue';
 
 import NSVueShadow from '../../'
-
 Vue.use(NSVueShadow)
 
 // Set the following to `true` to hide the logs created by nativescript-vue

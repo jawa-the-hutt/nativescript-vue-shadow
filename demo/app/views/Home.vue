@@ -5,17 +5,18 @@
     </ActionBar>
     <GridLayout rows="*, auto" columns="*" class="page">
       <StackLayout v-if="showAndroid" row="0" col="0">
-        <Button class="h3 m-15 p-10 ex1" :text="`elevation: ${elevation}`" v-shadow="{ shadow: elevation }" @tap="toggleClass()"></Button>
-        <Label :class="'h3 m-15 p-15 ' + bclass" :text="` elevation: ${elevation}, pressedElevation: ${elevation + 5}, forcePressAnimation: true`" v-shadow="{ shadow: { elevation: elevation, pressedElevation: elevation + 5, forcePressAnimation: true }}" @tap="dummy()"></Label>
-        <Label :class="'h3 m-15 p-10 ' + bclass2" :text="`elevation: ${elevation}, bgcolor: #006968, shape: shape.RECTANGLE, corderRadius: 15`"  v-shadow="{ elevation: elevation, shape: shape.RECTANGLE, bgcolor: '#006968', cornerRadius: 15 }"></Label>
-        <Label :class="'h1 m-15 p-15 ' + bclass3" :text="'☺'" v-shadow="{ shadow: androidData }" @tap="dummy()"></Label>
-        <Label :class="'h3 m-15 lbl5'" :text="` elevation: ${elevation}, bgcolor: #ff1744, shape: shape.OVAL`"></Label>
+        <Button class="h3 m-15 p-10 ex1" :text="`elevation: ${elevation}`" v-shadow="elevation" @tap="toggleClass()"></Button>
+        <Label :class="'h3 m-15 p-15 ' + bclass" :text="` elevation: ${elevation}, pressedElevation: ${elevation + 5}, forcePressAnimation: true`" v-shadow="{ elevation, pressedElevation: elevation + 5, forcePressAnimation: true }" @tap="dummy()"></Label>
+        <Label :class="'h3 m-15 p-10 ' + bclass2" :text="`elevation: ${elevation}, bgcolor: #006968, shape: shape.RECTANGLE, corderRadius: 15`"  v-shadow="{ elevation, shape: shape.RECTANGLE, bgcolor: '#006968', cornerRadius: 15 }"></Label>
+        <Label :class="'h1 m-15 p-15 ' + bclass3" :text="'☺'" v-shadow="androidData" @tap="dummy()"></Label>
+        <Label :class="'h3 m-15 lbl5'" :text="`elevation: ${elevation}, bgcolor: #ff1744, shape: shape.OVAL`"></Label>
       </StackLayout>
       <StackLayout v-else row="0" col="0">
-        <Label class="h3 m-15 p-10 ex1" :text="`elevation: ${elevation}`" v-shadow="{ shadow: elevation }"></Label>
-        <Label :class="'h3 m-15 p-10 ' + bclass" :text="` elevation: ${elevation}`" v-shadow="{ shadow: { elevation: elevation } }"></Label>
+        <Label class="h3 m-15 p-10 ex1" :text="`elevation: ${elevation}`" v-shadow="elevation"></Label>
+        <Label :class="'h3 m-15 p-10 ' + bclass" :text="` elevation: ${elevation}`" v-shadow="{ elevation }"></Label>
         <Label :class="'h3 m-15 p-10 ' + bclass2" :text="`elevation: ${elevation}, shadowOffset: 4`" v-shadow="{ elevation: elevation, shadowOffset: 4 }"></Label>
-        <Label :class="'h1 m-15 p-15 ' + bclass3" :text="'☺'" v-shadow="{ shadow: { elevation: elevation } }"></Label>
+        <Label :class="'h1 m-15 p-15 ' + bclass3" :text="'☺'" v-shadow="iosData"></Label>
+        <Label :class="'h3 m-15 lbl5'" :text="`elevation: ${elevation}, offset: 10, opacity: 0.5, radius: 10`"></Label>
       </StackLayout>
       <ListPicker row="1" col="0" :items="stdElevations" selectedIndex="2" @selectedIndexChange="setElevation($event)" class="p-15"></ListPicker>
     </GridLayout>
@@ -23,20 +24,21 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { AndroidData, Elevation, Shape, ShapeEnum } from '../../../';
+import { AndroidData, IOSData, Elevation, Shape, ShapeEnum } from '../../../';
 import { ListPicker } from 'tns-core-modules/ui/list-picker';
 import { isAndroid, isIOS } from 'tns-core-modules/platform';
 
 @Component({
   name: 'Home'
 })
-export default class App extends Vue {
+export default class Home extends Vue {
   private navbarTitle: string = `Nativescript-Vue-Shadow Demo`;
 
   private elevation: Elevation = 2;
   private shape = ShapeEnum;
   private stdElevations: string[] = [];
   private androidData!: AndroidData;
+  private iosData!: IOSData;
   private bclass: string = 'ex2';
   private bclass2: string = 'ex3';
   private bclass3: string = 'ex4';
@@ -52,6 +54,7 @@ export default class App extends Vue {
       }
     }
     this.androidData = this.getAndroidData();
+    this.iosData = this.getIOSData();
   }
 
   private getAndroidData(): AndroidData {
@@ -61,6 +64,16 @@ export default class App extends Vue {
       shape: ShapeEnum.OVAL,
       pressedElevation: this.elevation + 15,
       forcePressAnimation: true
+    };
+  }
+
+  private getIOSData(): IOSData {
+    return {
+      elevation: this.elevation,
+      shadowColor: '#000000',
+      shadowOffset: 10,
+      shadowOpacity: 0.5,
+      shadowRadius: 10
     };
   }
 
@@ -74,6 +87,7 @@ export default class App extends Vue {
     const picker = newValue.object as ListPicker;
     this.elevation = Elevation[this.stdElevations[picker.selectedIndex]];
     this.androidData = this.getAndroidData();
+    this.iosData = this.getIOSData();
   }
 
   //dummy tap function to make a view clickable
