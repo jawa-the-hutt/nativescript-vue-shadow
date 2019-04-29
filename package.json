@@ -1,6 +1,6 @@
 {
   "name": "nativescript-vue-shadow",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Nativescript-Vue Shadow Plugin",
   "main": "dist/nativescript-vue-shadow.umd.js",
   "module": "dist/nativescript-vue-shadow.esm.js",
