@@ -1,25 +1,24 @@
 // rollup.config.js
-import vue from "rollup-plugin-vue";
-import commonjs from "rollup-plugin-commonjs";
-import replace from "rollup-plugin-replace";
-import { terser } from "rollup-plugin-terser";
-import typescript from "rollup-plugin-typescript2";
-import minimist from "minimist";
-import resolve from "rollup-plugin-node-resolve";
+import vue from 'rollup-plugin-vue';
+import commonjs from 'rollup-plugin-commonjs';
+import replace from 'rollup-plugin-replace';
+import typescript from 'rollup-plugin-typescript2';
+import minimist from 'minimist';
+import resolve from 'rollup-plugin-node-resolve';
 
 const argv = minimist(process.argv.slice(2));
 
 const baseConfig = {
-  input: "src/index.ts",
+  input: 'src/index.ts',
   inlineDynamicImports: true,
   plugins: [
     replace({
-      "process.env.NODE_ENV": JSON.stringify("production")
+      'process.env.NODE_ENV': JSON.stringify('production')
     }),
     resolve(),
     commonjs(),
     typescript({
-      tsconfig: "tsconfig.json",
+      tsconfig: 'tsconfig.json',
       useTsconfigDeclarationDir: true,
       objectHashIgnoreUnknownHack: true,
       clean: true
@@ -39,33 +38,37 @@ const baseConfig = {
 const external = [
   // list external dependencies, exactly the way it is written in the import statement.
   // eg. 'jquery'
-  "nativescript-vue",
-  "tns-core-modules/color",
-  "tns-core-modules/platform",
-  "tns-core-modules/ui/page/page",
-  "tns-core-modules/ui/core/weak-event-listener",
-  "'tns-core-modules/ui/layouts/stack-layout"
+  'nativescript-vue',
+  '@nativescript/core/color',
+  '@nativescript/core/platform',
+  '@nativescript/core/ui/page/page',
+  '@nativescript/core/ui/core/weak-event-listener',
+  '@nativescript/core/ui/layouts/stack-layout',
+  '@nativescript/core/ui/styling/style-properties',
+  '@nativescript/core/ui/core/view'
 ];
 const globals = {
   // Provide global variable names to replace your external imports
   // eg. jquery: '$'
-  "nativescript-vue": 'vue',
-  "tns-core-modules/color": 'color',
-  "tns-core-modules/platform": 'platform',
-  "tns-core-modules/ui/page/page": 'page',
-  "tns-core-modules/ui/core/weak-event-listener" : 'weakEventListener',
+  'nativescript-vue': 'vue',
+  '@nativescript/core/color': 'color',
+  '@nativescript/core/platform': 'platform',
+  '@nativescript/core/ui/page': 'page',
+  '@nativescript/core/ui/core/weak-event-listener': 'weakEventListener',
+  '@nativescript/core/ui/core/view': 'view',
+  '@nativescript/core/ui/styling/style-properties': 'styleProperties'
 };
 
 // Customize configs for individual targets
 const buildFormats = [];
-if (!argv.format || argv.format === "es") {
+if (!argv.format || argv.format === 'es') {
   const esConfig = {
     ...baseConfig,
     external,
     output: {
-      file: "dist/nativescript-vue-shadow.esm.js",
-      format: "esm",
-      exports: "named"
+      file: 'dist/nativescript-vue-shadow.esm.js',
+      format: 'esm',
+      exports: 'named'
     },
     plugins: [
       ...baseConfig.plugins
@@ -79,16 +82,16 @@ if (!argv.format || argv.format === "es") {
   buildFormats.push(esConfig);
 }
 
-if (!argv.format || argv.format === "umd") {
+if (!argv.format || argv.format === 'umd') {
   const umdConfig = {
     ...baseConfig,
     external,
     output: {
       compact: true,
-      file: "dist/nativescript-vue-shadow.umd.js",
-      format: "umd",
-      name: "NativescriptVueshadow",
-      exports: "named",
+      file: 'dist/nativescript-vue-shadow.umd.js',
+      format: 'umd',
+      name: 'NativescriptVueshadow',
+      exports: 'named',
       globals
     },
     plugins: [
@@ -103,16 +106,16 @@ if (!argv.format || argv.format === "umd") {
   buildFormats.push(umdConfig);
 }
 
-if (!argv.format || argv.format === "iife") {
+if (!argv.format || argv.format === 'iife') {
   const unpkgConfig = {
     ...baseConfig,
     external,
     output: {
       compact: true,
-      file: "dist/nativescript-vue-shadow.js",
-      format: "iife",
-      name: "NativescriptVueshadow",
-      exports: "named",
+      file: 'dist/nativescript-vue-shadow.js',
+      format: 'iife',
+      name: 'NativescriptVueshadow',
+      exports: 'named',
       globals
     },
     plugins: [

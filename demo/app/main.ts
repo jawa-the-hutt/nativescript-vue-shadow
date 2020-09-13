@@ -1,8 +1,8 @@
 import Vue from 'nativescript-vue';
 import App from './App.vue';
 
-import NSVueShadow from '../../'
-Vue.use(NSVueShadow)
+import NSVueShadow from '../../';
+Vue.use(NSVueShadow);
 
 // Set the following to `true` to hide the logs created by nativescript-vue
 Vue.config.silent = false;
@@ -16,5 +16,5 @@ import VueDevtools from 'nativescript-vue-devtools';
 Vue.use(VueDevtools, { host: '10.0.2.2' });
 
 new Vue({
-  render: h => h('frame', [h(App)]),
+  render: (h) => h('frame', [h(App)])
 }).$start();
