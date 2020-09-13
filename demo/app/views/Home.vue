@@ -6,8 +6,17 @@
     <GridLayout rows="*, auto" columns="*" class="page">
       <StackLayout v-if="showAndroid" row="0" col="0">
         <Button class="h3 m-15 p-10 ex1" :text="`elevation: ${elevation}`" v-shadow="elevation" @tap="toggleClass()"></Button>
-        <Label :class="'h3 m-15 p-15 ' + bclass" :text="` elevation: ${elevation}, pressedElevation: ${elevation + 5}, forcePressAnimation: true`" v-shadow="{ elevation, pressedElevation: elevation + 5, forcePressAnimation: true }" @tap="dummy()"></Label>
-        <Label :class="'h3 m-15 p-10 ' + bclass2" :text="`elevation: ${elevation}, bgcolor: #006968, shape: shape.RECTANGLE, corderRadius: 15`"  v-shadow="{ elevation, shape: shape.RECTANGLE, bgcolor: '#006968', cornerRadius: 15 }"></Label>
+        <Label
+          :class="'h3 m-15 p-15 ' + bclass"
+          :text="` elevation: ${elevation}, pressedElevation: ${elevation + 5}, forcePressAnimation: true`"
+          v-shadow="{ elevation, pressedElevation: elevation + 5, forcePressAnimation: true }"
+          @tap="dummy()"
+        ></Label>
+        <Label
+          :class="'h3 m-15 p-10 ' + bclass2"
+          :text="`elevation: ${elevation}, bgcolor: #006968, shape: shape.RECTANGLE, corderRadius: 15`"
+          v-shadow="{ elevation, shape: shape.RECTANGLE, bgcolor: '#006968', cornerRadius: 15 }"
+        ></Label>
         <Label :class="'h1 m-15 p-15 ' + bclass3" :text="'☺'" v-shadow="androidData" @tap="dummy()"></Label>
         <Label :class="'h3 m-15 lbl5'" :text="`elevation: ${elevation}, bgcolor: #ff1744, shape: shape.OVAL`"></Label>
       </StackLayout>
@@ -25,8 +34,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { AndroidData, IOSData, Elevation, Shape, ShapeEnum } from '../../../';
-import { ListPicker } from 'tns-core-modules/ui/list-picker';
-import { isAndroid, isIOS } from 'tns-core-modules/platform';
+import { ListPicker } from '@nativescript/core/ui/list-picker';
+import { isAndroid, isIOS } from '@nativescript/core/platform';
 
 @Component({
   name: 'Home'
@@ -98,7 +107,7 @@ export default class Home extends Vue {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
-@import '~nativescript-theme-core/css/core.light.css';
+@import '~@nativescript/theme/core';
 
 .btn {
   font-size: 18;

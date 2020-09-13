@@ -1,5 +1,5 @@
-import { AndroidData } from "./android-data.model";
-import { IOSData } from "./ios-data.model";
+import { AndroidData } from './android-data.model';
+import { IOSData } from './ios-data.model';
 import { ShapeEnum } from './shape.enum';
 export declare class Shadow {
     static DEFAULT_SHAPE: ShapeEnum;

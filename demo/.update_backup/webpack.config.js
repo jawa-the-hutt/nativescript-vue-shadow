@@ -281,11 +281,13 @@ module.exports = (env) => {
         verbose: !!verbose
       }),
       // Copy assets
-      new CopyWebpackPlugin([
-        { from: 'assets/**', noErrorOnMissing: true, globOptions: { dot: false, ...copyIgnore } },
-        { from: 'fonts/**', noErrorOnMissing: true, globOptions: { dot: false, ...copyIgnore } },
-        { from: '**/*.+(jpg|png)', noErrorOnMissing: true, globOptions: { dot: false, ...copyIgnore } }
-      ]),
+      new CopyWebpackPlugin({
+        patterns: [
+          { from: 'assets/**', noErrorOnMissing: true, globOptions: { dot: false, ...copyIgnore } },
+          { from: 'fonts/**', noErrorOnMissing: true, globOptions: { dot: false, ...copyIgnore } },
+          { from: '**/*.+(jpg|png)', noErrorOnMissing: true, globOptions: { dot: false, ...copyIgnore } }
+        ]
+      }),
       new nsWebpack.GenerateNativeScriptEntryPointsPlugin('bundle'),
       // For instructions on how to set up workers with webpack
       // check out https://github.com/nativescript/worker-loader

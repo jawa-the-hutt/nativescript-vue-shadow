@@ -1,4 +1,4 @@
-(function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports,require('nativescript-vue'),require('tns-core-modules/platform'),require('tns-core-modules/color'),require('tns-core-modules/ui/page/page'),require('tns-core-modules/ui/core/weak-event-listener')):typeof define==='function'&&define.amd?define(['exports','nativescript-vue','tns-core-modules/platform','tns-core-modules/color','tns-core-modules/ui/page/page','tns-core-modules/ui/core/weak-event-listener'],f):(g=g||self,f(g.NativescriptVueshadow={},g.vue,g.platform,g.color,g.page,g.weakEventListener));}(this,function(exports, Vue, platform, color, page, weakEventListener){'use strict';Vue=Vue&&Vue.hasOwnProperty('default')?Vue['default']:Vue;(function (ShapeEnum) {
+(function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports,require('nativescript-vue'),require('@nativescript/core/platform'),require('@nativescript/core/color'),require('@nativescript/core/ui/styling/style-properties'),require('@nativescript/core/ui/core/view'),require('@nativescript/core/ui/core/weak-event-listener')):typeof define==='function'&&define.amd?define(['exports','nativescript-vue','@nativescript/core/platform','@nativescript/core/color','@nativescript/core/ui/styling/style-properties','@nativescript/core/ui/core/view','@nativescript/core/ui/core/weak-event-listener'],f):(g=g||self,f(g.NativescriptVueshadow={},g.vue,g.platform,g.color,g.styleProperties,g.view,g.weakEventListener));}(this,function(exports, Vue, platform, color, styleProperties, view, weakEventListener){'use strict';Vue=Vue&&Vue.hasOwnProperty('default')?Vue['default']:Vue;(function (ShapeEnum) {
     ShapeEnum["RECTANGLE"] = "RECTANGLE";
     ShapeEnum["OVAL"] = "OVAL";
     ShapeEnum["RING"] = "RING";
@@ -11,7 +11,7 @@ if (platform.isAndroid) {
 }
 const classCache = {};
 function getAndroidR(rtype, field) {
-    const className = "android.R$" + rtype;
+    const className = 'android.R$' + rtype;
     if (!classCache.hasOwnProperty(className)) {
         classCache[className] = {
             class: java.lang.Class.forName(className),
@@ -26,8 +26,7 @@ function getAndroidR(rtype, field) {
 class Shadow {
     static apply(tnsView, data) {
         const LOLLIPOP = 21;
-        if (tnsView.android &&
-            android.os.Build.VERSION.SDK_INT >= LOLLIPOP) {
+        if (tnsView.android && android.os.Build.VERSION.SDK_INT >= LOLLIPOP) {
             Shadow.applyOnAndroid(tnsView, Shadow.getDefaults(data));
         }
         else if (tnsView.ios) {
@@ -39,14 +38,13 @@ class Shadow {
             shape: data.shape || Shadow.DEFAULT_SHAPE,
             pressedElevation: data.pressedElevation || Shadow.DEFAULT_PRESSED_ELEVATION,
             pressedTranslationZ: data.pressedTranslationZ || Shadow.DEFAULT_PRESSED_ELEVATION,
-            shadowColor: data.shadowColor ||
-                Shadow.DEFAULT_SHADOW_COLOR,
-            useShadowPath: (data.useShadowPath !== undefined ? data.useShadowPath : true),
-            rasterize: (data.rasterize !== undefined ? data.rasterize : false)
+            shadowColor: data.shadowColor || Shadow.DEFAULT_SHADOW_COLOR,
+            useShadowPath: data.useShadowPath !== undefined ? data.useShadowPath : true,
+            rasterize: data.rasterize !== undefined ? data.rasterize : false
         });
     }
     static isShadow(drawable) {
-        return (drawable instanceof LayeredShadow || drawable instanceof PlainShadow);
+        return drawable instanceof LayeredShadow || drawable instanceof PlainShadow;
     }
     static applyOnAndroid(tnsView, data) {
         const nativeView = tnsView.android;
@@ -64,23 +62,26 @@ class Shadow {
         }
         if (overrideBackground) {
             if (Shadow.isShadow(currentBg)) {
-                currentBg = currentBg instanceof LayeredShadow ?
-                    currentBg.getDrawable(1) : null;
+                currentBg =
+                    currentBg instanceof LayeredShadow
+                        ? currentBg.getDrawable(1)
+                        : null;
             }
-            const outerRadii = Array.create("float", 8);
+            const outerRadii = Array.create('float', 8);
             if (data.cornerRadius === undefined) {
-                outerRadii[0] = outerRadii[1] = page.Length.toDevicePixels(tnsView.borderTopLeftRadius, 0);
-                outerRadii[2] = outerRadii[3] = page.Length.toDevicePixels(tnsView.borderTopRightRadius, 0);
-                outerRadii[4] = outerRadii[5] = page.Length.toDevicePixels(tnsView.borderBottomRightRadius, 0);
-                outerRadii[6] = outerRadii[7] = page.Length.toDevicePixels(tnsView.borderBottomLeftRadius, 0);
+                outerRadii[0] = outerRadii[1] = styleProperties.Length.toDevicePixels(tnsView.borderTopLeftRadius, 0);
+                outerRadii[2] = outerRadii[3] = styleProperties.Length.toDevicePixels(tnsView.borderTopRightRadius, 0);
+                outerRadii[4] = outerRadii[5] = styleProperties.Length.toDevicePixels(tnsView.borderBottomRightRadius, 0);
+                outerRadii[6] = outerRadii[7] = styleProperties.Length.toDevicePixels(tnsView.borderBottomLeftRadius, 0);
             }
             else {
                 java.util.Arrays.fill(outerRadii, Shadow.androidDipToPx(nativeView, data.cornerRadius));
             }
-            const bgColor = currentBg ?
-                (currentBg instanceof android.graphics.drawable.ColorDrawable && currentBg.getColor() ?
-                    currentBg.getColor() : android.graphics.Color.parseColor(data.bgcolor || Shadow.DEFAULT_BGCOLOR)) :
-                android.graphics.Color.parseColor(data.bgcolor || Shadow.DEFAULT_BGCOLOR);
+            const bgColor = currentBg
+                ? currentBg instanceof android.graphics.drawable.ColorDrawable && currentBg.getColor()
+                    ? currentBg.getColor()
+                    : android.graphics.Color.parseColor(data.bgcolor || Shadow.DEFAULT_BGCOLOR)
+                : android.graphics.Color.parseColor(data.bgcolor || Shadow.DEFAULT_BGCOLOR);
             let newBg;
             if (data.shape !== exports.ShapeEnum.RECTANGLE || data.bgcolor || !currentBg) {
                 shape = new PlainShadow();
@@ -111,8 +112,11 @@ class Shadow {
         const sla = new android.animation.StateListAnimator();
         const ObjectAnimator = android.animation.ObjectAnimator;
         const AnimatorSet = android.animation.AnimatorSet;
-        const shortAnimTime = getAndroidR("integer", "config_shortAnimTime");
-        const buttonDuration = nativeView.getContext().getResources().getInteger(shortAnimTime) / 2;
+        const shortAnimTime = getAndroidR('integer', 'config_shortAnimTime');
+        const buttonDuration = nativeView
+            .getContext()
+            .getResources()
+            .getInteger(shortAnimTime) / 2;
         const pressedElevation = this.androidDipToPx(nativeView, data.pressedElevation);
         const pressedZ = this.androidDipToPx(nativeView, data.pressedTranslationZ);
         const elevation = this.androidDipToPx(nativeView, data.elevation);
@@ -121,23 +125,13 @@ class Shadow {
         const notPressedSet = new AnimatorSet();
         const defaultSet = new AnimatorSet();
         pressedSet.playTogether(java.util.Arrays.asList([
-            ObjectAnimator.ofFloat(nativeView, "translationZ", [pressedZ])
-                .setDuration(buttonDuration),
-            ObjectAnimator.ofFloat(nativeView, "elevation", [pressedElevation])
-                .setDuration(0),
+            ObjectAnimator.ofFloat(nativeView, 'translationZ', [pressedZ]).setDuration(buttonDuration),
+            ObjectAnimator.ofFloat(nativeView, 'elevation', [pressedElevation]).setDuration(0)
         ]));
-        notPressedSet.playTogether(java.util.Arrays.asList([
-            ObjectAnimator.ofFloat(nativeView, "translationZ", [z])
-                .setDuration(buttonDuration),
-            ObjectAnimator.ofFloat(nativeView, "elevation", [elevation])
-                .setDuration(0),
-        ]));
-        defaultSet.playTogether(java.util.Arrays.asList([
-            ObjectAnimator.ofFloat(nativeView, "translationZ", [0]).setDuration(0),
-            ObjectAnimator.ofFloat(nativeView, "elevation", [0]).setDuration(0),
-        ]));
-        sla.addState([getAndroidR("attr", "state_pressed"), getAndroidR("attr", "state_enabled")], pressedSet);
-        sla.addState([getAndroidR("attr", "state_enabled")], notPressedSet);
+        notPressedSet.playTogether(java.util.Arrays.asList([ObjectAnimator.ofFloat(nativeView, 'translationZ', [z]).setDuration(buttonDuration), ObjectAnimator.ofFloat(nativeView, 'elevation', [elevation]).setDuration(0)]));
+        defaultSet.playTogether(java.util.Arrays.asList([ObjectAnimator.ofFloat(nativeView, 'translationZ', [0]).setDuration(0), ObjectAnimator.ofFloat(nativeView, 'elevation', [0]).setDuration(0)]));
+        sla.addState([getAndroidR('attr', 'state_pressed'), getAndroidR('attr', 'state_enabled')], pressedSet);
+        sla.addState([getAndroidR('attr', 'state_enabled')], notPressedSet);
         sla.addState([], defaultSet);
         nativeView.setStateListAnimator(sla);
     }
@@ -146,20 +140,11 @@ class Shadow {
         const elevation = parseFloat((data.elevation - 0).toFixed(2));
         nativeView.layer.maskToBounds = false;
         nativeView.layer.shadowColor = new color.Color(data.shadowColor).ios.CGColor;
-        nativeView.layer.shadowOffset =
-            data.shadowOffset ?
-                CGSizeMake(0, parseFloat(String(data.shadowOffset))) :
-                CGSizeMake(0, 0.54 * elevation - 0.14);
-        nativeView.layer.shadowOpacity =
-            data.shadowOpacity ?
-                parseFloat(String(data.shadowOpacity)) :
-                0.006 * elevation + 0.25;
-        nativeView.layer.shadowRadius =
-            data.shadowRadius ?
-                parseFloat(String(data.shadowRadius)) :
-                0.66 * elevation - 0.5;
+        nativeView.layer.shadowOffset = data.shadowOffset ? CGSizeMake(0, parseFloat(String(data.shadowOffset))) : CGSizeMake(0, 0.54 * elevation - 0.14);
+        nativeView.layer.shadowOpacity = data.shadowOpacity ? parseFloat(String(data.shadowOpacity)) : 0.006 * elevation + 0.25;
+        nativeView.layer.shadowRadius = data.shadowRadius ? parseFloat(String(data.shadowRadius)) : 0.66 * elevation - 0.5;
         nativeView.layer.shouldRasterize = data.rasterize;
-        nativeView.layer.rasterizationScale = platform.screen.mainScreen.scale;
+        nativeView.layer.rasterizationScale = platform.Screen.mainScreen.scale;
         let shadowPath = null;
         if (data.useShadowPath) {
             shadowPath = UIBezierPath.bezierPathWithRoundedRectCornerRadius(nativeView.bounds, nativeView.layer.shadowRadius).cgPath;
@@ -167,7 +152,10 @@ class Shadow {
         nativeView.layer.shadowPath = shadowPath;
     }
     static androidDipToPx(nativeView, dip) {
-        const metrics = nativeView.getContext().getResources().getDisplayMetrics();
+        const metrics = nativeView
+            .getContext()
+            .getResources()
+            .getDisplayMetrics();
         return android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_DIP, dip, metrics);
     }
 }
@@ -192,13 +180,14 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
         if (binding.value && typeof binding.value === 'object' && binding.value.elevation) {
             this.shadow = binding.value;
             this.elevation = this.shadow.elevation;
-            if (platform.isAndroid && (('pressedElevation' in this.shadow) ||
-                ('shape' in this.shadow) ||
-                ('bgcolor' in this.shadow) ||
-                ('cornerRadius' in this.shadow) ||
-                ('translationZ' in this.shadow) ||
-                ('pressedTranslationZ' in this.shadow) ||
-                ('forcePressAnimation' in this.shadow))) {
+            if (platform.isAndroid &&
+                ('pressedElevation' in this.shadow ||
+                    'shape' in this.shadow ||
+                    'bgcolor' in this.shadow ||
+                    'cornerRadius' in this.shadow ||
+                    'translationZ' in this.shadow ||
+                    'pressedTranslationZ' in this.shadow ||
+                    'forcePressAnimation' in this.shadow)) {
                 this.pressedElevation = this.shadow.pressedElevation;
                 this.shape = this.shadow.shape;
                 this.bgcolor = this.shadow.bgcolor;
@@ -207,13 +196,14 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
                 this.pressedTranslationZ = this.shadow.pressedTranslationZ;
                 this.forcePressAnimation = this.shadow.forcePressAnimation;
             }
-            else if (platform.isIOS && (('maskToBounds' in this.shadow) ||
-                ('shadowColor' in this.shadow) ||
-                ('shadowOffset' in this.shadow) ||
-                ('shadowOpacity' in this.shadow) ||
-                ('shadowRadius' in this.shadow) ||
-                ('useShadowPath' in this.shadow) ||
-                ('rasterize' in this.shadow))) {
+            else if (platform.isIOS &&
+                ('maskToBounds' in this.shadow ||
+                    'shadowColor' in this.shadow ||
+                    'shadowOffset' in this.shadow ||
+                    'shadowOpacity' in this.shadow ||
+                    'shadowRadius' in this.shadow ||
+                    'useShadowPath' in this.shadow ||
+                    'rasterize' in this.shadow)) {
                 this.maskToBounds = this.shadow.maskToBounds;
                 this.shadowColor = this.shadow.shadowColor;
                 this.shadowOffset = this.shadow.shadowOffset;
@@ -260,8 +250,8 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
     }
     bindEvents() {
         if (!this.eventsBound) {
-            weakEventListener.addWeakEventListener(this.el._nativeView, page.View.loadedEvent, this.load, this);
-            weakEventListener.addWeakEventListener(this.el._nativeView, page.View.unloadedEvent, this.unload, this);
+            weakEventListener.addWeakEventListener(this.el._nativeView, view.View.loadedEvent, this.load, this);
+            weakEventListener.addWeakEventListener(this.el._nativeView, view.View.unloadedEvent, this.unload, this);
             this.eventsBound = true;
             if (this.el._nativeView.isLoaded) {
                 this.load();
@@ -270,8 +260,8 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
     }
     unbindEvents() {
         if (this.eventsBound) {
-            weakEventListener.removeWeakEventListener(this.el._nativeView, page.View.loadedEvent, this.load, this);
-            weakEventListener.removeWeakEventListener(this.el._nativeView, page.View.unloadedEvent, this.unload, this);
+            weakEventListener.removeWeakEventListener(this.el._nativeView, view.View.loadedEvent, this.load, this);
+            weakEventListener.removeWeakEventListener(this.el._nativeView, view.View.unloadedEvent, this.unload, this);
             this.eventsBound = false;
         }
     }
@@ -365,7 +355,7 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
                         cornerRadius: this.cornerRadius,
                         translationZ: this.translationZ,
                         pressedTranslationZ: this.pressedTranslationZ,
-                        forcePressAnimation: this.forcePressAnimation,
+                        forcePressAnimation: this.forcePressAnimation
                     });
                 }
                 else if (platform.isIOS) {
@@ -389,7 +379,7 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
             const originalElement = this.el;
             const parent = originalElement.parentNode;
             const vm = new Vue({
-                template: '<StackLayout></StackLayout>',
+                template: '<StackLayout></StackLayout>'
             }).$mount();
             const wrapper = vm.$el;
             parent.insertBefore(wrapper, originalElement);
@@ -443,7 +433,7 @@ const ShadowDirective = {
         const shadowDir = el.__vShadow;
         shadowDir.destroy();
         el.__vShadow = null;
-    },
+    }
 };(function (Elevation) {
     Elevation[Elevation["SWITCH"] = 1] = "SWITCH";
     Elevation[Elevation["CARD_RESTING"] = 2] = "CARD_RESTING";
