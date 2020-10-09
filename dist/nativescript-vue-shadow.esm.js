@@ -1,8 +1,9 @@
 import Vue from 'nativescript-vue';
-import { isAndroid, screen, isIOS } from 'tns-core-modules/platform';
-import { Color } from 'tns-core-modules/color';
-import { Length, View } from 'tns-core-modules/ui/page/page';
-import { addWeakEventListener, removeWeakEventListener } from 'tns-core-modules/ui/core/weak-event-listener';
+import { isAndroid, Screen, isIOS } from '@nativescript/core';
+let screen = Screen;
+import { Color } from '@nativescript/core';
+import { Length, View } from '@nativescript/core';
+import { addWeakEventListener, removeWeakEventListener } from "@nativescript/core";
 
 var ShapeEnum;
 (function (ShapeEnum) {
