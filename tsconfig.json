@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "outDir": "dist",
+    "target": "ES2017",
     "module": "esnext",
+    "moduleResolution": "node",
+    "outDir": "dist",
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
-    "moduleResolution": "node",
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -33,7 +33,11 @@
       "dom",
       "dom.iterable",
       "scripthost"
-    ]
+    ],
+    "plugins": [{
+      "transform": "@nativescript/webpack/transformers/ns-transform-native-classes",
+      "type": "raw"
+    }]
   },
   "include": [
     "src/**/*",

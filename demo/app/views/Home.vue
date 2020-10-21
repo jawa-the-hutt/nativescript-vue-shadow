@@ -23,10 +23,9 @@
   </Page>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import  { Component, Vue } from 'vue-property-decorator';
 import { AndroidData, IOSData, Elevation, Shape, ShapeEnum } from '../../../';
-import { ListPicker } from 'tns-core-modules/ui/list-picker';
-import { isAndroid, isIOS } from 'tns-core-modules/platform';
+import { ListPicker, isAndroid, isIOS } from '@nativescript/core';
 
 @Component({
   name: 'Home'
@@ -98,7 +97,7 @@ export default class Home extends Vue {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
-@import '~nativescript-theme-core/css/core.light.css';
+@import '~@nativescript/theme/css/core.css';
 
 .btn {
   font-size: 18;
