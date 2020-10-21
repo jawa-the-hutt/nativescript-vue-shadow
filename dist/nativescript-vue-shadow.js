@@ -1,11 +1,11 @@
-var NativescriptVueshadow=(function(exports,Vue,platform,color,page,weakEventListener){'use strict';Vue=Vue&&Vue.hasOwnProperty('default')?Vue['default']:Vue;(function (ShapeEnum) {
+var NativescriptVueshadow=(function(exports,Vue,core){'use strict';function _interopDefaultLegacy(e){return e&&typeof e==='object'&&'default'in e?e:{'default':e}}var Vue__default=/*#__PURE__*/_interopDefaultLegacy(Vue);(function (ShapeEnum) {
     ShapeEnum["RECTANGLE"] = "RECTANGLE";
     ShapeEnum["OVAL"] = "OVAL";
     ShapeEnum["RING"] = "RING";
     ShapeEnum["LINE"] = "LINE";
 })(exports.ShapeEnum || (exports.ShapeEnum = {}));let LayeredShadow;
 let PlainShadow;
-if (platform.isAndroid) {
+if (core.isAndroid) {
     LayeredShadow = android.graphics.drawable.LayerDrawable.extend({});
     PlainShadow = android.graphics.drawable.GradientDrawable.extend({});
 }
@@ -69,10 +69,10 @@ class Shadow {
             }
             const outerRadii = Array.create("float", 8);
             if (data.cornerRadius === undefined) {
-                outerRadii[0] = outerRadii[1] = page.Length.toDevicePixels(tnsView.borderTopLeftRadius, 0);
-                outerRadii[2] = outerRadii[3] = page.Length.toDevicePixels(tnsView.borderTopRightRadius, 0);
-                outerRadii[4] = outerRadii[5] = page.Length.toDevicePixels(tnsView.borderBottomRightRadius, 0);
-                outerRadii[6] = outerRadii[7] = page.Length.toDevicePixels(tnsView.borderBottomLeftRadius, 0);
+                outerRadii[0] = outerRadii[1] = core.Length.toDevicePixels(tnsView.borderTopLeftRadius, 0);
+                outerRadii[2] = outerRadii[3] = core.Length.toDevicePixels(tnsView.borderTopRightRadius, 0);
+                outerRadii[4] = outerRadii[5] = core.Length.toDevicePixels(tnsView.borderBottomRightRadius, 0);
+                outerRadii[6] = outerRadii[7] = core.Length.toDevicePixels(tnsView.borderBottomLeftRadius, 0);
             }
             else {
                 java.util.Arrays.fill(outerRadii, Shadow.androidDipToPx(nativeView, data.cornerRadius));
@@ -145,7 +145,7 @@ class Shadow {
         const nativeView = tnsView.ios;
         const elevation = parseFloat((data.elevation - 0).toFixed(2));
         nativeView.layer.maskToBounds = false;
-        nativeView.layer.shadowColor = new color.Color(data.shadowColor).ios.CGColor;
+        nativeView.layer.shadowColor = new core.Color(data.shadowColor).ios.CGColor;
         nativeView.layer.shadowOffset =
             data.shadowOffset ?
                 CGSizeMake(0, parseFloat(String(data.shadowOffset))) :
@@ -159,7 +159,7 @@ class Shadow {
                 parseFloat(String(data.shadowRadius)) :
                 0.66 * elevation - 0.5;
         nativeView.layer.shouldRasterize = data.rasterize;
-        nativeView.layer.rasterizationScale = platform.screen.mainScreen.scale;
+        nativeView.layer.rasterizationScale = core.Screen.mainScreen.scale;
         let shadowPath = null;
         if (data.useShadowPath) {
             shadowPath = UIBezierPath.bezierPathWithRoundedRectCornerRadius(nativeView.bounds, nativeView.layer.shadowRadius).cgPath;
@@ -192,7 +192,7 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
         if (binding.value && typeof binding.value === 'object' && binding.value.elevation) {
             this.shadow = binding.value;
             this.elevation = this.shadow.elevation;
-            if (platform.isAndroid && (('pressedElevation' in this.shadow) ||
+            if (core.isAndroid && (('pressedElevation' in this.shadow) ||
                 ('shape' in this.shadow) ||
                 ('bgcolor' in this.shadow) ||
                 ('cornerRadius' in this.shadow) ||
@@ -207,7 +207,7 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
                 this.pressedTranslationZ = this.shadow.pressedTranslationZ;
                 this.forcePressAnimation = this.shadow.forcePressAnimation;
             }
-            else if (platform.isIOS && (('maskToBounds' in this.shadow) ||
+            else if (core.isIOS && (('maskToBounds' in this.shadow) ||
                 ('shadowColor' in this.shadow) ||
                 ('shadowOffset' in this.shadow) ||
                 ('shadowOpacity' in this.shadow) ||
@@ -222,8 +222,9 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
                 this.useShadowPath = this.shadow.useShadowPath;
                 this.rasterize = this.shadow.rasterize;
             }
+            else ;
         }
-        if (platform.isAndroid) {
+        if (core.isAndroid) {
             if (this.el._nativeView._redrawNativeBackground) {
                 this.originalNSFn = this.el._nativeView._redrawNativeBackground;
             }
@@ -260,8 +261,8 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
     }
     bindEvents() {
         if (!this.eventsBound) {
-            weakEventListener.addWeakEventListener(this.el._nativeView, page.View.loadedEvent, this.load, this);
-            weakEventListener.addWeakEventListener(this.el._nativeView, page.View.unloadedEvent, this.unload, this);
+            core.addWeakEventListener(this.el._nativeView, core.View.loadedEvent, this.load, this);
+            core.addWeakEventListener(this.el._nativeView, core.View.unloadedEvent, this.unload, this);
             this.eventsBound = true;
             if (this.el._nativeView.isLoaded) {
                 this.load();
@@ -270,22 +271,22 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
     }
     unbindEvents() {
         if (this.eventsBound) {
-            weakEventListener.removeWeakEventListener(this.el._nativeView, page.View.loadedEvent, this.load, this);
-            weakEventListener.removeWeakEventListener(this.el._nativeView, page.View.unloadedEvent, this.unload, this);
+            core.removeWeakEventListener(this.el._nativeView, core.View.loadedEvent, this.load, this);
+            core.removeWeakEventListener(this.el._nativeView, core.View.unloadedEvent, this.unload, this);
             this.eventsBound = false;
         }
     }
     load() {
         this.loaded = true;
         this.applyShadow();
-        if (platform.isAndroid) {
+        if (core.isAndroid) {
             this.previousNSFn = this.el._nativeView._redrawNativeBackground;
             this.el._nativeView._redrawNativeBackground = this.monkeyPatch;
         }
     }
     unload() {
         this.loaded = false;
-        if (platform.isAndroid) {
+        if (core.isAndroid) {
             this.el._nativeView._redrawNativeBackground = this.originalNSFn;
         }
     }
@@ -293,12 +294,12 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
         if (!this.shadow && !this.elevation) {
             return;
         }
-        if (platform.isAndroid) {
+        if (core.isAndroid) {
             if (android.os.Build.VERSION.SDK_INT < 21) {
                 return;
             }
         }
-        const viewToApplyShadowTo = platform.isIOS ? this.iosShadowWrapper : this.el._nativeView;
+        const viewToApplyShadowTo = core.isIOS ? this.iosShadowWrapper : this.el._nativeView;
         if (viewToApplyShadowTo) {
             Shadow.apply(viewToApplyShadowTo, {
                 elevation: this.elevation,
@@ -341,22 +342,22 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
         if (!this.initialized) {
             this.initialized = true;
             this.initializeCommonData();
-            if (platform.isAndroid) {
+            if (core.isAndroid) {
                 this.initializeAndroidData();
             }
-            else if (platform.isIOS) {
+            else if (core.isIOS) {
                 this.initializeIOSData();
             }
             if (this.shadow && this.shadow.elevation) {
-                if (platform.isAndroid) {
+                if (core.isAndroid) {
                     this.loadFromAndroidData(this.shadow);
                 }
-                else if (platform.isIOS) {
+                else if (core.isIOS) {
                     this.loadFromIOSData(this.shadow);
                 }
             }
             if (!this.shadow && this.elevation) {
-                if (platform.isAndroid) {
+                if (core.isAndroid) {
                     this.loadFromAndroidData({
                         elevation: this.elevation,
                         pressedElevation: this.pressedElevation,
@@ -368,7 +369,7 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
                         forcePressAnimation: this.forcePressAnimation,
                     });
                 }
-                else if (platform.isIOS) {
+                else if (core.isIOS) {
                     this.loadFromIOSData({
                         elevation: this.elevation,
                         maskToBounds: this.maskToBounds,
@@ -385,10 +386,10 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
         }
     }
     addIOSWrapper() {
-        if (platform.isIOS) {
+        if (core.isIOS) {
             const originalElement = this.el;
             const parent = originalElement.parentNode;
-            const vm = new Vue({
+            const vm = new Vue__default['default']({
                 template: '<StackLayout></StackLayout>',
             }).$mount();
             const wrapper = vm.$el;
@@ -407,10 +408,10 @@ Shadow.DEFAULT_PRESSED_Z = 4;class NativeShadowDirective {
             if (typeof values === 'object' && values.elevation) {
                 this.shadow = values;
                 this.elevation = this.shadow.elevation;
-                if (platform.isAndroid) {
+                if (core.isAndroid) {
                     this.loadFromAndroidData(this.shadow);
                 }
-                else if (platform.isIOS) {
+                else if (core.isIOS) {
                     this.loadFromIOSData(this.shadow);
                 }
             }
@@ -493,4 +494,4 @@ else if (typeof global !== "undefined" && typeof global['Vue'] !== 'undefined') 
 }
 if (GlobalVue) {
     GlobalVue.use(NSVueShadow);
-}exports.Shadow=Shadow;exports.default=NSVueShadow;exports.install=install;return exports;}({},vue,platform,color,page,weakEventListener));
+}exports.Shadow=Shadow;exports.default=NSVueShadow;exports.install=install;Object.defineProperty(exports,'__esModule',{value:true});return exports;}({},vue,core));

@@ -1,10 +1,14 @@
-import { Color } from 'tns-core-modules/color';
+import {
+  Color,
+    Length,
+  isAndroid,
+  Screen,
+
+} from '@nativescript/core';
 
 import { AndroidData } from "./android-data.model";
 import { IOSData } from "./ios-data.model";
 import { ShapeEnum } from './shape.enum';
-import { Length } from 'tns-core-modules/ui/page/page';
-import { isAndroid, screen } from "tns-core-modules/platform";
 import { Shape } from './shape.enum';
 
 declare const android: any;
@@ -45,7 +49,7 @@ export class Shadow {
   static DEFAULT_PRESSED_ELEVATION = 2;
   static DEFAULT_PRESSED_Z = 4;
 
-  static apply(tnsView: any, data: IOSData | AndroidData) {
+  static apply(tnsView: any, data: { elevation: number; shape: "RECTANGLE" | "OVAL" | "RING" | "LINE" | undefined; pressedTranslationZ: number | string | undefined; useShadowPath: boolean | undefined; shadowOpacity: number; cornerRadius: number | undefined; maskToBounds: boolean | undefined; pressedElevation: number; shadowRadius: number; bgcolor: string | undefined; forcePressAnimation: boolean | undefined; rasterize: boolean | undefined; shadowOffset: number; translationZ: number | string | undefined; shadowColor: string | undefined }) {
     const LOLLIPOP = 21;
     if (
       tnsView.android &&
@@ -212,7 +216,7 @@ export class Shadow {
         parseFloat(String(data.shadowRadius)) :
         0.66 * elevation - 0.5;
     nativeView.layer.shouldRasterize = data.rasterize;
-    nativeView.layer.rasterizationScale = screen.mainScreen.scale;
+    nativeView.layer.rasterizationScale = Screen.mainScreen.scale;
     let shadowPath = null;
     if (data.useShadowPath) {
       shadowPath = UIBezierPath.bezierPathWithRoundedRectCornerRadius(nativeView.bounds, nativeView.layer.shadowRadius).cgPath;

@@ -1,14 +1,18 @@
 import Vue from 'nativescript-vue';
 import { DirectiveOptions, VNodeDirective, VNode } from 'vue';
-import { isAndroid, isIOS } from 'tns-core-modules/platform';
+import {
+  isAndroid,
+  isIOS,
+  View,
+  StackLayout,
+  addWeakEventListener,
+  removeWeakEventListener
+} from '@nativescript/core';
 
 import { AndroidData } from './common/android-data.model';
 import { IOSData } from './common/ios-data.model';
 import { Shadow } from './common/shadow';
 import { Shape } from './common/shape.enum';
-import { View } from 'tns-core-modules/ui/page/page';
-import { StackLayout } from 'tns-core-modules/ui/layouts/stack-layout';
-import { addWeakEventListener, removeWeakEventListener } from "tns-core-modules/ui/core/weak-event-listener";
 declare const android: any;
 
 export interface ShadowBindings extends VNodeDirective {
@@ -25,7 +29,7 @@ export class NativeShadowDirective {
   private pressedElevation?: number | string;
   private shape?: Shape;
   private bgcolor?: string;
-  private cornerRadius?: number | string;
+  private cornerRadius?: number;
   private translationZ?: number | string;
   private pressedTranslationZ?: number | string;
   private forcePressAnimation?: boolean;
